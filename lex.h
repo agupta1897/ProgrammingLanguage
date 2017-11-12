@@ -28,6 +28,10 @@ typedef enum
     SET,
     CALL,
     ASSIGN,
+    LAMBDA,
+    IF,
+    ELSE,
+    WHILE,
     UNKNOWN
     
 } types;

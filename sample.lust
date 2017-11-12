@@ -1,15 +1,22 @@
 define name = 25;
-    define name2 = "HELLO";
 
 define string1 = "HEllo how are you";
-set name = ( ((03 + twe)) + (3 )); 
+set name = ( name + (3 )); 
 
+if( "faweuyv" = ( name + (3 ))){
+
+} else
+{
+    define name2 = "HELLO";
+};
 
 define func1 = lambda( name1, name2)
 {
     define name1 = 34;
     define name = lambda(s, t, joigoijags, fdsa) {}; 
-    ~comment
+   
 };
+
+call func1( 2, "dc" );
 
 

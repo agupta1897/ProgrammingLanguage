@@ -17,10 +17,15 @@ int ch;
 
 /* read chars until a non-whitespace character is encountered */
 
-while ((ch = fgetc(fp)) != EOF && isspace(ch))
+while ((ch = fgetc(fp)) != EOF && (isspace(ch) || ch == '~'))
 {
     if (ch == '\n')
     lineNum++;
+    if (ch == '~')
+    {
+    readLine(fp);
+        lineNum++;
+    }
    // fprintf(stdout, "SKIPPING:%c\n", ch);
 }
 
@@ -106,6 +111,9 @@ lexeme* newVariableLex ( FILE* fp)
     if( strcasecmp(keyword, "define") == 0) token->type = DEFINE; else
     if( strcasecmp(keyword, "set") == 0) token->type = SET; else
     if( strcasecmp(keyword, "call") == 0) token->type = CALL; else
+    if( strcasecmp(keyword, "lambda") == 0) token->type = LAMBDA; else
+    if( strcasecmp(keyword, "if") == 0) token->type = IF; else
+    if( strcasecmp(keyword, "else") == 0) token->type = ELSE; else
     if( strcasecmp (keyword, "null") == 0) token->type = Null;
      else
     {
@@ -174,7 +182,10 @@ lexeme* lex()
         else
         if( ch=='~')
         {
-            return newCommentLex(fp);
+            ungetc(ch,fp);
+            skipWhiteSpace(fp);
+            lex();
+
         }
         return newLex(UNKNOWN);
     }
@@ -243,6 +254,12 @@ void Display ( FILE *out, lexeme *l)
         fprintf(out, "SET\n" );
     else if (l->type == CALL)
         fprintf(out, "CALL\n" );
+    else if (l->type == LAMBDA)
+        fprintf(out, "LAMBDA\n" );
+    else if (l->type == IF)
+        fprintf(out, "IF\n" );
+    else if (l->type == ELSE)
+        fprintf(out, "ELSE\n" );
     else
     fprintf(out, "%s \n", s);
 }
@@ -305,10 +322,7 @@ int callPending()
 {
     return check(CALL);
 }
-int mathExpPending()
-{
-    return check(OPAREN);
-}
+
 int cparenPending()
 {
     return check(CPAREN);
@@ -333,8 +347,30 @@ int oparenPending()
 {
     return check(OPAREN);
 }
+int commaPending()
+{
+    return check(COMMA);
+}
+int lambdaPending()
+{
+    return check(LAMBDA);
+}
+int cbracketPending()
+{
+    return check(CBRACKET);
+}
+
+int ifPending()
+{
+    return check(IF);
+}
+int elsePending()
+{
+    return check(ELSE);
+}
 
 void mathExp();
+void statement();
 
 void value()
 {
@@ -351,7 +387,7 @@ void restofExp()
     if(timesPending()) match(TIMES); else
     match(MINUS);
 
-    if(mathExpPending()) mathExp();else
+    if(oparenPending()) mathExp();else
     if(integerPending()) match(INTEGER);else
     match(VARIABLE);
 
@@ -364,15 +400,72 @@ void restofExp()
 void mathExp()
 {
     match(OPAREN);
-    if(mathExpPending()) mathExp(); else
+    if(oparenPending()) mathExp(); else
     if (integerPending()) match(INTEGER);
     else
     match(VARIABLE);
-    
+
     if (cparenPending()) match(CPAREN);
     else
     restofExp();
     
+}
+
+void functionBody()
+{
+    if(cbracketPending())
+    {
+        match(CBRACKET);
+    }
+    else{
+    statement();
+    functionBody();
+    }
+}
+
+void optionalArgs()
+{
+    match(VARIABLE);
+    if (commaPending()) 
+    {
+        match(COMMA);
+        optionalArgs();
+    }
+    else
+    {
+    match(CPAREN);
+    match(OBRACKET);
+    functionBody();
+    }
+}
+
+void optionalCallArgs()
+{
+    value();
+    if (commaPending()) 
+    {
+        match(COMMA);
+        optionalCallArgs();
+    }
+    else
+    {
+    match(CPAREN);
+    }
+}
+
+void function ()
+{
+    match(LAMBDA);
+    match(OPAREN);
+    if (cparenPending())
+    {
+        match(CPAREN);
+        match(OBRACKET);
+        functionBody();
+    }
+    else
+    optionalArgs();
+
 }
 
 
@@ -381,15 +474,27 @@ void definition ()
     match(DEFINE);
     match(VARIABLE);
     match(ASSIGN);
+    if (lambdaPending())
+    {
+        function();
+    }
+    else
     value();
 }     
 
-// void call()
-// {
-//     match(CALL);
-//     match(OPAREN);
-//     if()
-// }
+void call()
+{
+    match(CALL);
+    match (VARIABLE);
+    match(OPAREN);
+    if (cparenPending())
+    {
+        match(CPAREN);
+    }
+    else
+    optionalCallArgs();
+
+}
 
 void assign()
 {
@@ -397,7 +502,7 @@ void assign()
     match(VARIABLE);
     match(ASSIGN);
     //if(callPending()) call();
-    if(mathExpPending()) mathExp();
+    if(oparenPending()) mathExp();
     else
      if(stringPending()) match(STRING);
     else
@@ -405,11 +510,47 @@ void assign()
    
 }
 
+void iffunc()
+{
+    match(IF);
+    match(OPAREN);
+
+    if(oparenPending()) mathExp();
+    else value();
+
+    if(cparenPending()){
+        match(CPAREN);
+    }
+    else
+    {
+        match(ASSIGN);
+        if(oparenPending()) mathExp();
+        else
+        value();
+        match(CPAREN);
+    }
+    match(OBRACKET);
+    functionBody();
+
+    if (elsePending())
+    {
+        match(ELSE);
+        match(OBRACKET);
+        functionBody();
+    }
+}
+
+
+
 void statement()
 {
     if(definitionPending()) definition();
     else
     if(assignPending()) assign();
+    else
+    if(callPending()) call();
+    else
+    if(ifPending()) iffunc();
     match(SEMICOLON);
 }
 
