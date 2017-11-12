@@ -1,0 +1,4 @@
+define name = 25;
+define num1 = 30;
+define string1 = "HEllo how are you";
+seT name = ( ((03 + twe))); 
