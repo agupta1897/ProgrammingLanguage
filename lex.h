@@ -28,10 +28,18 @@ typedef enum
     SET,
     CALL,
     ASSIGN,
+    EQUALS,
     LAMBDA,
     IF,
     ELSE,
     WHILE,
+    OR,
+    AND,
+    LESSTHAN,
+    GREATERTHAN,
+    ARRAY,
+    OSBRACKET,
+    CSBRACKET,
     UNKNOWN
     
 } types;
@@ -44,11 +52,13 @@ typedef struct lexeme
         int integerVal;
         types type;
         int lineNum;
+        struct lexeme *right;
+        struct lexeme *left;
 
     } lexeme;
 
 extern lexeme *newLex (types type);
-extern lexeme *lex ();
+extern lexeme *lex (FILE *fp);
 extern void Display (FILE* fp, lexeme *l);
 extern lexeme *newIntLex (FILE *fp);
 extern lexeme *newVariableLex (FILE *fp);

@@ -114,6 +114,11 @@ lexeme* newVariableLex ( FILE* fp)
     if( strcasecmp(keyword, "lambda") == 0) token->type = LAMBDA; else
     if( strcasecmp(keyword, "if") == 0) token->type = IF; else
     if( strcasecmp(keyword, "else") == 0) token->type = ELSE; else
+    if( strcasecmp(keyword, "or") == 0) token->type = OR; else
+    if( strcasecmp(keyword, "and") == 0) token->type = AND; else
+    if( strcasecmp(keyword, "equals") == 0) token->type = EQUALS; else
+    if( strcasecmp(keyword, "while") == 0) token->type = WHILE; else
+    if( strcasecmp(keyword, "array") == 0) token->type = ARRAY; else
     if( strcasecmp (keyword, "null") == 0) token->type = Null;
      else
     {
@@ -126,8 +131,9 @@ return token;
 
 
 
-lexeme* lex()
+lexeme* lex(FILE *file)
 {
+    fp = file;
     skipWhiteSpace (fp);
     char ch;
     ch = fgetc(fp);
@@ -159,8 +165,16 @@ lexeme* lex()
         return newLex(CBRACKET);
     case ';':
         return newLex(SEMICOLON);
-     case '=':
+    case '=':
         return newLex(ASSIGN);
+    case '<':
+        return newLex(LESSTHAN);
+    case '>':
+        return newLex(GREATERTHAN);
+    case '[':
+        return newLex(OSBRACKET);
+    case ']':
+        return newLex(CSBRACKET);
     default:
         if(isdigit(ch))
         {
@@ -184,7 +198,7 @@ lexeme* lex()
         {
             ungetc(ch,fp);
             skipWhiteSpace(fp);
-            lex();
+            lex(fp);
 
         }
         return newLex(UNKNOWN);
@@ -234,7 +248,13 @@ void Display ( FILE *out, lexeme *l)
             s = "ENDOFINPUT";
             break;
         case ASSIGN:
-            s = "ASSIGN";
+            s = "ASSIGN: =";
+            break;
+        case OSBRACKET:
+             s = "SQUARE BRACKET - [";
+            break;
+        case CSBRACKET:
+             s = "SQUARE BRACKET - ]";
             break;
         default:
             s = "UNKNOWN";
@@ -260,314 +280,23 @@ void Display ( FILE *out, lexeme *l)
         fprintf(out, "IF\n" );
     else if (l->type == ELSE)
         fprintf(out, "ELSE\n" );
+    else if (l->type == AND)
+        fprintf(out, "AND\n" );
+    else if (l->type == OR)
+        fprintf(out, "OR\n" );
+    else if (l->type == EQUALS)
+        fprintf(out, "EQUALS\n" );     
+    else if (l->type == WHILE)
+        fprintf(out, "WHILE\n" );
+    else if (l->type == LESSTHAN)
+        fprintf(out, "LESSTHAN\n" );
+    else if (l->type == GREATERTHAN)
+        fprintf(out, "GREATERTHAN\n" ); 
+    else if (l->type == ARRAY)
+        fprintf(out, "ARRAY\n" );       
     else
     fprintf(out, "%s \n", s);
 }
 
-int check( types type) 
-        { 
-        return currentLex->type == type; 
-        }
-void advance() 
-        { 
-        currentLex = lex(); 
-        } 
 
-  
-void matchNoAdvance(types type)
-        {
-        if (!check(type))
-        {
-            fprintf(stdout,"SYNTAX ERROR ~~ Line No: %d Expected -", currentLex->lineNum );
-            lexeme *temp = malloc(sizeof(lexeme));
-            temp->type = type;
-            Display(stdout, temp);
-            fprintf(stdout,"GOT: ");
-            Display(stdout, currentLex);
-            exit(-1);
-        }
-    }
-
-void match( types type) 
-        { 
-        matchNoAdvance(type); 
-        advance(); 
-        }
-
-int variablePending()
-{
-    return check(VARIABLE);
-}
-
-int stringPending()
-{
-    return check(STRING);
-}
-
-int integerPending()
-{
-    return check(INTEGER);
-}
-
-int definitionPending()
-{
-    return check(DEFINE);
-}
-
-int assignPending()
-{
-    return check(SET);
-}
-int callPending()
-{
-    return check(CALL);
-}
-
-int cparenPending()
-{
-    return check(CPAREN);
-}
-int plusPending()
-{
-    return check(PLUS);
-}
-int dividesPending()
-{
-    return check(DIVIDES);
-}
-int timesPending()
-{
-    return check(TIMES);
-}
-int minusPending()
-{
-    return check(MINUS);
-}
-int oparenPending()
-{
-    return check(OPAREN);
-}
-int commaPending()
-{
-    return check(COMMA);
-}
-int lambdaPending()
-{
-    return check(LAMBDA);
-}
-int cbracketPending()
-{
-    return check(CBRACKET);
-}
-
-int ifPending()
-{
-    return check(IF);
-}
-int elsePending()
-{
-    return check(ELSE);
-}
-
-void mathExp();
-void statement();
-
-void value()
-{
-    if(variablePending()) match(VARIABLE);
-    else if(stringPending()) match(STRING);
-    else match(INTEGER);
-}
-
-void restofExp()
-{
-    
-    if(plusPending()) match(PLUS); else
-    if(dividesPending()) match(DIVIDES); else
-    if(timesPending()) match(TIMES); else
-    match(MINUS);
-
-    if(oparenPending()) mathExp();else
-    if(integerPending()) match(INTEGER);else
-    match(VARIABLE);
-
-    if (cparenPending()) match(CPAREN);
-    else
-    restofExp();
-
-}
-
-void mathExp()
-{
-    match(OPAREN);
-    if(oparenPending()) mathExp(); else
-    if (integerPending()) match(INTEGER);
-    else
-    match(VARIABLE);
-
-    if (cparenPending()) match(CPAREN);
-    else
-    restofExp();
-    
-}
-
-void functionBody()
-{
-    if(cbracketPending())
-    {
-        match(CBRACKET);
-    }
-    else{
-    statement();
-    functionBody();
-    }
-}
-
-void optionalArgs()
-{
-    match(VARIABLE);
-    if (commaPending()) 
-    {
-        match(COMMA);
-        optionalArgs();
-    }
-    else
-    {
-    match(CPAREN);
-    match(OBRACKET);
-    functionBody();
-    }
-}
-
-void optionalCallArgs()
-{
-    value();
-    if (commaPending()) 
-    {
-        match(COMMA);
-        optionalCallArgs();
-    }
-    else
-    {
-    match(CPAREN);
-    }
-}
-
-void function ()
-{
-    match(LAMBDA);
-    match(OPAREN);
-    if (cparenPending())
-    {
-        match(CPAREN);
-        match(OBRACKET);
-        functionBody();
-    }
-    else
-    optionalArgs();
-
-}
-
-
-void definition ()
-{
-    match(DEFINE);
-    match(VARIABLE);
-    match(ASSIGN);
-    if (lambdaPending())
-    {
-        function();
-    }
-    else
-    value();
-}     
-
-void call()
-{
-    match(CALL);
-    match (VARIABLE);
-    match(OPAREN);
-    if (cparenPending())
-    {
-        match(CPAREN);
-    }
-    else
-    optionalCallArgs();
-
-}
-
-void assign()
-{
-    match(SET);
-    match(VARIABLE);
-    match(ASSIGN);
-    //if(callPending()) call();
-    if(oparenPending()) mathExp();
-    else
-     if(stringPending()) match(STRING);
-    else
-     match(INTEGER);
-   
-}
-
-void iffunc()
-{
-    match(IF);
-    match(OPAREN);
-
-    if(oparenPending()) mathExp();
-    else value();
-
-    if(cparenPending()){
-        match(CPAREN);
-    }
-    else
-    {
-        match(ASSIGN);
-        if(oparenPending()) mathExp();
-        else
-        value();
-        match(CPAREN);
-    }
-    match(OBRACKET);
-    functionBody();
-
-    if (elsePending())
-    {
-        match(ELSE);
-        match(OBRACKET);
-        functionBody();
-    }
-}
-
-
-
-void statement()
-{
-    if(definitionPending()) definition();
-    else
-    if(assignPending()) assign();
-    else
-    if(callPending()) call();
-    else
-    if(ifPending()) iffunc();
-    match(SEMICOLON);
-}
-
-
-
-void program()
-{
-    if (check(END_OF_INPUT)) return;
-    else
-        statement();
-    program();
-}
-
-void recognize(FILE *file)
-{
-    fp = file;
-    currentLex = lex();
-    program(fp);
-}
 

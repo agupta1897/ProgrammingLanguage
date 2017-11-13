@@ -1,9 +1,9 @@
 define name = 25;
 
 define string1 = "HEllo how are you";
-set name = ( name + (3 )); 
+set name = ( name + (3)); 
 
-if( "faweuyv" = ( name + (3 ))){
+if( x > "asfb" and z and (x + y) equals (c + x) ){
 
 } else
 {
@@ -12,11 +12,18 @@ if( "faweuyv" = ( name + (3 ))){
 
 define func1 = lambda( name1, name2)
 {
-    define name1 = 34;
+    define name1 = 34 ;
     define name = lambda(s, t, joigoijags, fdsa) {}; 
    
 };
 
-call func1( 2, "dc" );
+
+array func1 [name1];
+
+while(2 > (x / y))
+{
+ define name1 = 34 ;
+};
+~call func1( 2, "dc" );
 
 
