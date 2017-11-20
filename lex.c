@@ -2,10 +2,9 @@
 #include"lex.h"
 #include<stdio.h>
 #include<stdlib.h>
-#include <ctype.h>
+#include<ctype.h>
 #include<string.h>
 #include<strings.h>
-
 
 lexeme* currentLex;
 FILE *fp;
@@ -24,7 +23,7 @@ while ((ch = fgetc(fp)) != EOF && (isspace(ch) || ch == '~'))
     if (ch == '~')
     {
     readLine(fp);
-        lineNum++;
+    lineNum++;
     }
    // fprintf(stdout, "SKIPPING:%c\n", ch);
 }
@@ -108,7 +107,7 @@ lexeme* newVariableLex ( FILE* fp)
         exit(-1);
     }
     char *keyword = readToken(fp);
-    if( strcasecmp(keyword, "define") == 0) token->type = DEFINE; else
+    if( strcasecmp(keyword, "def") == 0) token->type = DEFINE; else
     if( strcasecmp(keyword, "set") == 0) token->type = SET; else
     if( strcasecmp(keyword, "call") == 0) token->type = CALL; else
     if( strcasecmp(keyword, "lambda") == 0) token->type = LAMBDA; else
@@ -118,7 +117,9 @@ lexeme* newVariableLex ( FILE* fp)
     if( strcasecmp(keyword, "and") == 0) token->type = AND; else
     if( strcasecmp(keyword, "equals") == 0) token->type = EQUALS; else
     if( strcasecmp(keyword, "while") == 0) token->type = WHILE; else
-    if( strcasecmp(keyword, "array") == 0) token->type = ARRAY; else
+    if( strcasecmp(keyword, "defarray") == 0) token->type = DEFARRAY; else
+    if( strcasecmp(keyword, "callarray") == 0) token->type = CALLARRAY; else
+    if( strcasecmp(keyword, "display") == 0) token->type = DISPLAY; else
     if( strcasecmp (keyword, "null") == 0) token->type = Null;
      else
     {
@@ -292,9 +293,27 @@ void Display ( FILE *out, lexeme *l)
         fprintf(out, "LESSTHAN\n" );
     else if (l->type == GREATERTHAN)
         fprintf(out, "GREATERTHAN\n" ); 
-    else if (l->type == ARRAY)
-        fprintf(out, "ARRAY\n" );       
-    else
+    else if (l->type == DEFARRAY)
+        fprintf(out, "DEFARRAY\n" );       
+    else if (l->type == PROGRAM)
+        fprintf(out, "PROGRAM\n" );    
+    else if (l->type == NEXT)
+        fprintf(out, "NEXT\n" );
+    else if (l->type == MATH)
+        fprintf(out, "MATHEXP\n" );
+    else if (l->type == CALLARRAY)
+        fprintf(out, "CALL ARRAY\n" );
+    else if (l->type == COND)
+        fprintf(out, "CONDITIONAL\n" );
+    else if (l->type == THEN)
+        fprintf(out, "THEN\n" );
+    else if (l->type == DISPLAY)
+        fprintf(out, "DISPLAY\n" );
+    else if (l->type == ENV)
+        fprintf(out, "Environment\n" );
+    else if (l->type == TABLE)
+        fprintf(out, "Table\n" );
+    else       
     fprintf(out, "%s \n", s);
 }
 

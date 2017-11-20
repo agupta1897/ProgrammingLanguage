@@ -32,14 +32,23 @@ typedef enum
     LAMBDA,
     IF,
     ELSE,
+    COND,
+    THEN,
     WHILE,
     OR,
     AND,
     LESSTHAN,
     GREATERTHAN,
-    ARRAY,
+    DEFARRAY,
+    CALLARRAY,
     OSBRACKET,
     CSBRACKET,
+    PROGRAM,
+    NEXT,
+    MATH,
+    DISPLAY,
+    ENV,
+    TABLE,
     UNKNOWN
     
 } types;
@@ -63,6 +72,6 @@ extern void Display (FILE* fp, lexeme *l);
 extern lexeme *newIntLex (FILE *fp);
 extern lexeme *newVariableLex (FILE *fp);
 extern lexeme *newStringLex (FILE *fp);
-extern void recognize(FILE *fp);
+//extern void recognize(FILE *fp);
 
 #endif

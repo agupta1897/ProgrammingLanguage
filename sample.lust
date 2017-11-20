@@ -1,29 +1,45 @@
-define name = 25;
-
-define string1 = "HEllo how are you";
-set name = ( name + (3)); 
-
-if( x > "asfb" and z and (x + y) equals (c + x) ){
-
-} else
+def func1 = lambda( name1, name2)
 {
-    define name2 = "HELLO";
+~ set name = (25 + (callarray s [35] - 45));
+~ set name = callarray s [35];
+~ };
+~  call func1( 2,name , "DC"  );
 };
+def n = ( 2 + 2 + ((3 + 5) / (2 + 2)));
+display n;
+set n = (2*3*10 + 2 + 2 + ((3 + 5) / (2 + 2 )));
+call func1( 2 , name);
 
-define func1 = lambda( name1, name2)
-{
-    define name1 = 34 ;
-    define name = lambda(s, t, joigoijags, fdsa) {}; 
+
+~ display x;
+~ display y;
+
+~ set name = (25 + (35 - 45));
+~ set name = 35;
+~ def string1 = "Hello how are you";
+~ set name = ( name + (3)); 
+
+~ if( x > "asfb" and callArray y [2] < 1 and (x + y) equals (c + x) ){
+~     set name = 35;
+~ } 
+~ else
+~ {
+~     def name2 = "HELLO";
+~ };
+
+~ def func1 = lambda( name1, name2)
+~ {
+~     def name1 = 34 ;
+~     def name = lambda(s, t, joigoijags, fdsa) {}; 
    
-};
+~ };
 
+~ defarray func1 [name1];
 
-array func1 [name1];
-
-while(2 > (x / y))
-{
- define name1 = 34 ;
-};
-~call func1( 2, "dc" );
+~  while(callArray x[i] > callArray y[j])
+~  {
+~   def name1 = 34 ;
+~  };
+~ callArray func1[2];
 
 

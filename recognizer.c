@@ -1,8 +1,10 @@
 #include"scanner.h"
 #include"lex.h"
+#include"recognizer.h"
+#include"environment.h"
 #include<stdio.h>
 #include<stdlib.h>
-#include <ctype.h>
+#include<ctype.h>
 #include<string.h>
 #include<strings.h>
 
@@ -14,12 +16,11 @@ int check( types type)
         { 
         return currentLex->type == type; 
         }
-void advance() 
+lexeme* advance() 
         { 
-        //lexeme *temp = currentLex;
-
+        lexeme *temp = currentLex;
         currentLex = lex(fp); 
-        //return temp;
+        return temp;
         } 
 
   
@@ -37,11 +38,10 @@ void matchNoAdvance(types type)
         }
     }
 
-void match( types type) 
+lexeme* match( types type) 
         { 
-        matchNoAdvance(type);
-        advance(); 
-        //return advance(); 
+        matchNoAdvance(type); 
+        return advance(); 
         }
 
 int variablePending()
@@ -148,184 +148,256 @@ int lessthanPending()
 }
 int arrayPending()
 {
-    return check(ARRAY);
+    return check(DEFARRAY);
 }
 
-void mathExp();
-void statement();
-
-void value()
+int callArrayPending()
 {
-    if(variablePending()) match(VARIABLE);
-    else if(stringPending()) match(STRING);
-    else match(INTEGER);
+    return check(CALLARRAY);
 }
 
-void restofExp()
+int displaypending()
 {
+    return check(DISPLAY);
+}
+
+lexeme* mathExp();
+lexeme* statement();
+lexeme* callArray();
+
+lexeme* value()
+{
+    if(variablePending()) return match(VARIABLE);
+    else if(stringPending()) return match(STRING);
+    else return match(INTEGER);
+}
+
+lexeme* restofExp()
+{
+    lexeme *t;
+    if(plusPending()) t = match(PLUS); else
+    if(dividesPending()) t= match(DIVIDES); else
+    if(timesPending()) t= match(TIMES); else
+    t= match(MINUS);
+
+    if(oparenPending()) t->left = mathExp();
+    else
     
-    if(plusPending()) match(PLUS); else
-    if(dividesPending()) match(DIVIDES); else
-    if(timesPending()) match(TIMES); else
-    match(MINUS);
-
-    if(oparenPending()) mathExp();else
-    if(integerPending()) match(INTEGER);else
-    match(VARIABLE);
-
+    if(integerPending()) t->left = match(INTEGER);
+    else
+    if(callArrayPending()) t->left = callArray();
+    else
+    t->left = match(VARIABLE);
+    
     if (cparenPending()) match(CPAREN);
     else
-    restofExp();
+    t->right = restofExp();
 
+    return t;
 }
 
 
-void mathExp()
+lexeme* mathExp()
 {
+    lexeme *t = newLex(MATH);
     match(OPAREN);
-    if(oparenPending()) mathExp(); else
-    if (integerPending()) match(INTEGER);
+    if(oparenPending()) t->left = mathExp(MATH); 
     else
-    match(VARIABLE);
+    if(callArrayPending()) t->left = callArray();
+    else
+    if (integerPending()) t->left = match(INTEGER);
+    else
+    t->left = match(VARIABLE);
 
     if (cparenPending()) match(CPAREN);
     else
-    restofExp();
+    t->right = restofExp();
+
+    return t;
     
 }
 
-void functionBody()
+lexeme* functionBody()
 {
+    lexeme* t;
     if(cbracketPending())
     {
         match(CBRACKET);
+        return NULL;
     }
     else{
-    statement();
-    functionBody();
-    }
+    t = statement();
+    t->right = functionBody();
+    return t;
 }
 
-void optionalArgs()
+}
+
+lexeme* optionalArgs()
 {
-    match(VARIABLE);
+    lexeme* t = match(VARIABLE);
     if (commaPending()) 
     {
         match(COMMA);
-        optionalArgs();
+        t->left = optionalArgs();
+        return t;
     }
     else
     {
     match(CPAREN);
     match(OBRACKET);
-    functionBody();
+    t->right = functionBody();
+    return t;
     }
 }
 
-void optionalCallArgs()
+lexeme* optionalCallArgs()
 {
-    value();
+    lexeme *t;
+
+    if(callArrayPending()) t = callArray();
+    else
+    t = value();
+
     if (commaPending()) 
     {
         match(COMMA);
-        optionalCallArgs();
+        t->right = optionalCallArgs();
+        return t;
     }
     else
     {
     match(CPAREN);
+    return t;
     }
 }
 
-void function ()
+lexeme* function ()
 {
-    match(LAMBDA);
+    lexeme* t = match(LAMBDA);
     match(OPAREN);
     if (cparenPending())
     {
         match(CPAREN);
         match(OBRACKET);
-        functionBody();
+       t->right =  functionBody();
+       return t;
     }
     else
-    optionalArgs();
+  t->left =  optionalArgs();
+  return t;
 
 }
 
 
-void definition ()
+lexeme* definition ()
 {
-    match(DEFINE);
-    match(VARIABLE);
+    lexeme *t = match(DEFINE);
+    
+    t->left = match(VARIABLE);
     match(ASSIGN);
     if (lambdaPending())
     {
-        function();
+       t->right= function();
+       return t;
     }
     else
-    value();
+    if(oparenPending()) t->right  = mathExp();
+    else
+    t->right = value();
+    return t;
 }     
 
-void call()
+lexeme* call()
 {
-    match(CALL);
-    match (VARIABLE);
+    lexeme *t = match(CALL);
+    t->left = match (VARIABLE);
     match(OPAREN);
     if (cparenPending())
     {
         match(CPAREN);
+        return t;
     }
-    else
-    optionalCallArgs();
-
+    else{
+    t->right = optionalCallArgs();
+    return t;
+    }
 }
 
-void assign()
+lexeme* callArray()
+  {
+     lexeme * t = match(CALLARRAY);
+    t->left = match (VARIABLE);
+    match(OSBRACKET);
+    if(integerPending()) t->right = match(INTEGER);
+    else
+    t->right = match(VARIABLE);
+    match(CSBRACKET);
+    return t;
+}
+
+lexeme* assign()
 {
-     match(SET);
-    match(VARIABLE);
+    lexeme* t = match(SET);
+    t->left = match(VARIABLE);
     match(ASSIGN);
-    //if(callPending()) call();
-    if(oparenPending()) mathExp();
+    if(callPending()) t->right =  call();
+    else 
+    if(callArrayPending()) t->right = callArray();
     else
-     if(stringPending()) match(STRING);
+    if(oparenPending()) t->right = mathExp();
     else
-     match(INTEGER);
-   // return t;
+     if(stringPending()) t->right = match(STRING);
+    else
+     t->right = match(INTEGER);
+   return t;
     }
     
-void restofIfCond()
+lexeme* restofIfCond()
 {
-    if(orPending()) match(OR);
-        else match(AND);
+     lexeme *t;
+    if(orPending()) t = match(OR);
+        else t = match(AND);
 
-    if(oparenPending()) mathExp();
-        else value();
+    if(callArrayPending()) t->left = callArray();
+    else
+    if(oparenPending()) t->left = mathExp();
+    else t->left= value();
 
     if(orPending() || andPending())
-        restofIfCond();
+        t->right = restofIfCond();
     else if(equalsPending() || greaterthanPending() || lessthanPending() )
     {
-        if(greaterthanPending()) match(GREATERTHAN);
+        if(greaterthanPending()) t->right = match(GREATERTHAN);
         else
-        if(lessthanPending()) match(LESSTHAN);
+        if(lessthanPending()) t->right =  match(LESSTHAN);
         else
-        match(EQUALS);
+        t->right = match(EQUALS);
+        
+        if(callArrayPending()) t->right->left = callArray();
+        else
+        if(oparenPending()) t->right->left = mathExp();
+        else
+        t->right->left =  value();
 
-        if(oparenPending()) mathExp();
-        else
-        value();
         if(orPending() || andPending())
-        restofIfCond();
+        t->right->right = restofIfCond();
+        return t;
     }
+    return t;
 }
 
-void iffunc()
+lexeme * iffunc()
 {
-    match(IF);
+    lexeme * t = match(IF);
     match(OPAREN);
+    t->left = newLex(COND);
+    t->right = newLex(THEN);
 
-    if(oparenPending()) mathExp();
-    else value();
+     if(callArrayPending()) t->left->left = callArray();
+    else
+    if(oparenPending()) t->left->left = mathExp();
+    else t->left->left = value();
     
 
     if(cparenPending()){
@@ -333,103 +405,191 @@ void iffunc()
     }
     else if(equalsPending() || greaterthanPending() || lessthanPending() )
     {   
-        if(greaterthanPending()) match(GREATERTHAN);
+        if(greaterthanPending()) t->left->right = match(GREATERTHAN);
         else
-        if(lessthanPending()) match(LESSTHAN);
+        if(lessthanPending()) t->left->right= match(LESSTHAN);
         else
-        match(EQUALS);
-        if(oparenPending()) mathExp();
+         t->left->right = match(EQUALS);
+        
+        if(callArrayPending()) t->left->right->left = callArray();
         else
-        value();
+        if(oparenPending()) t->left->right->left= mathExp();
+        else
+        t->left->right->left = value();
+
         if(cparenPending()){
             match(CPAREN);        
             }
             else
-            restofIfCond();
+            t->left->right->right = restofIfCond();
             match(CPAREN);
     }
     else
     {
          //if(orPending() )
-         restofIfCond();
+         t->left->right = restofIfCond();
          match(CPAREN);
     }
 
     match(OBRACKET);
-    functionBody();
+    t->right->left = functionBody();
 
     if (elsePending())
     {
         match(ELSE);
         match(OBRACKET);
-        functionBody();
+        t->right->right = functionBody();
     }
+    return t;
 }
 
-void whileloop()
+lexeme* displaying()
 {
-    match(WHILE);
+    lexeme * t = match(DISPLAY);
+    if (callPending()) t->left = call();
+    else
+    if (callArrayPending()) t->left = callArray();
+    else
+    if (oparenPending()) t->left = mathExp();
+    else
+    t->left = value();
+    return t;
+}
+
+lexeme*  whileloop()
+{
+    lexeme *t = match(WHILE);
     match(OPAREN);
+    t->left = newLex(COND);
 
-    if(oparenPending()) mathExp();
-    else value();
+    if(callArrayPending()) t->left->left = callArray();
+    else
+    if(oparenPending()) t->left->left = mathExp();
+    else t->left->left = value();
 
-    if(greaterthanPending()) match(GREATERTHAN);
+    if(greaterthanPending()) t->left->right = match(GREATERTHAN);
     else
-    if(lessthanPending()) match(LESSTHAN);
+    if(lessthanPending()) t->left->right = match(LESSTHAN);
     else
-    {
-        
-    match(EQUALS);
+    {    
+    t->left->right = match(EQUALS);
     }
-    if(oparenPending()) mathExp();
-    else value();
+
+    if(callArrayPending()) t->left->right->left = callArray();
+    else
+    if(oparenPending()) t->left->right->left = mathExp();
+    else  t->left->right->left = value();
+
+    if(orPending() || andPending())
+        t->left->right->right = restofIfCond();
+
     match (CPAREN);
     match (OBRACKET);
-    functionBody();
+   t->right= functionBody();
+   return t;
 }
 
-void array()
+lexeme* array()
 {
-    match(ARRAY);
-    match (VARIABLE);
+    lexeme* t= match(DEFARRAY);
+    t->left = match (VARIABLE);
     match(OSBRACKET);
     if(integerPending())
-    match(INTEGER);
+    t->right = match(INTEGER);
     else
-    match(VARIABLE);
+    t->right = match(VARIABLE);
     match(CSBRACKET);
+    return t;
 }
 
-void statement()
+lexeme* statement()
 {
-    if(definitionPending()) definition();
+    lexeme* t = newLex(NEXT);
+    if(definitionPending()) 
+        t->left = definition();
+     else
+    if(setPending()) t->left = assign();
+     else
+     if(callPending()) t->left =  call();
+     else
+     if(ifPending())t->left = iffunc();
+        else
+    if(whilePending()) t->left = whileloop();
     else
-    if(setPending()) assign();
+    if(arrayPending()) t->left =  array();
     else
-    if(callPending()) call();
+    if (callArrayPending())
+     t->left = callArray();
     else
-    if(ifPending()) iffunc();
-    else
-    if(whilePending()) whileloop();
-    else
-    if(arrayPending()) array();
+    if(displaypending())
+    t->left = displaying();
     match(SEMICOLON);
+    return t;
 }
 
-
-
-void program()
+int indent = 0;
+int nextcount = 0;
+lexeme* parent;
+int flag1 = 0;
+lexeme* program( lexeme *t)
 {
-    if (check(END_OF_INPUT)) return;
+    if (flag1 == 0)
+    {
+        parent = t;
+        flag1 =1;
+    }
+    if (check(END_OF_INPUT)) return parent;
     else
-        statement();
-    program();
+    {
+       t->right = statement();
+    }
+    program(t->right);
 }
 
-void recognize(FILE *file)
-{
+    void indentprinter(FILE *fp)
+    {
+        for (int i = 0 ; i< indent; i++)
+        {
+            fprintf(fp," ");
+        }
+    }
+    void printTree(FILE *fp, lexeme* tree, int flag){
+
+        if (tree == NULL)
+        {   
+        return;
+        }
+
+        if(flag == 1)
+        {
+            indentprinter(fp);
+            fprintf(fp, "Left  : ");
+            Display(fp, tree);
+        }
+        else
+        {
+            indentprinter(fp);
+            fprintf(fp, "Right : ");
+            Display(fp, tree);
+        }
+        
+        indent++;
+        indent++;
+        printTree(fp, tree->left, 1);
+        
+        printTree(fp,tree->right, 2);
+        indent--;
+        indent--;
+    }
+
+lexeme* recognize(FILE *file)
+{   
+    lexeme *t = newLex(PROGRAM);
     fp = file;
     currentLex = lex(fp);
-    program();
+    lexeme *x;
+    x = program(t);
+    Display(stdout, x);
+    
+    return x;
 }

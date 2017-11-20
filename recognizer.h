@@ -4,5 +4,6 @@
 #ifndef __RECOGNIZE_INCLUDED__
 #define __RECOGNIZE_INCLUDED__
 
-extern void recognize( FILE *fp );
+extern lexeme* recognize( FILE *fp );
+extern void printTree(FILE *fp, lexeme* tree, int flag);
 #endif
