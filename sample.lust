@@ -1,14 +1,22 @@
+
+def int = 5;
 def func1 = lambda( name1, name2)
 {
-~ set name = (25 + (callarray s [35] - 45));
-~ set name = callarray s [35];
-~ };
-~  call func1( 2,name , "DC"  );
+
+def func2 = lambda ( name3, name4)
+{
+        display name3;
+        display name4;
+        display name1;
+        display int;
 };
-def n = ( 2 + 2 + ((3 + 5) / (2 + 2)));
-display n;
-set n = (2*3*10 + 2 + 2 + ((3 + 5) / (2 + 2 )));
-call func1( 2 , name);
+call func2 ( 888, 000);
+};
+call func1 ( 2 , 4);
+
+
+~display 3;
+~ call func1( 2, 4);
 
 
 ~ display x;

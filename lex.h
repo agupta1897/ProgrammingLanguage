@@ -49,6 +49,7 @@ typedef enum
     DISPLAY,
     ENV,
     TABLE,
+    ARG, 
     UNKNOWN
     
 } types;
@@ -63,6 +64,7 @@ typedef struct lexeme
         int lineNum;
         struct lexeme *right;
         struct lexeme *left;
+        struct lexeme *definingEnv;
 
     } lexeme;
 

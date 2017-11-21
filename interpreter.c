@@ -82,13 +82,26 @@ lexeme* evalDivides( lexeme* tree, lexeme* env, lexeme* eleftOparant)
         
         return evalSimpleOp(tree->right, env, result);
     }
-
     return result;
+}
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+lexeme* evalArgs(lexeme* list, lexeme* env)
+{
+return list;
 }
 
 lexeme* evalCall( lexeme* tree, lexeme *env)
 {
+    lexeme *lambda = lookup(tree->left,env );
+    lexeme *definingEnv = lambda->definingEnv;
+    lexeme *varlist = lambda->left;
+    lexeme *body = lambda->right;
     
+    lexeme *valList = evalArgs(tree->right, env);
+    lexeme *extendedEnv = extend(varlist, valList, definingEnv);
+    return eval(body, extendedEnv);
 }
 
 lexeme* evalTimes( lexeme* tree, lexeme* env, lexeme* eleftOparant)
@@ -136,23 +149,35 @@ lexeme *evalMath(lexeme *tree, lexeme *env)
 
 lexeme *evalDisplay(lexeme *tree, lexeme *env)
 {
-    lexeme *value = lookup(tree->left, env);
-    if (value == NULL)
+    if(tree->left->type == INTEGER)
     {
-        exit(1);
+        fprintf(stdout, "%d", tree->left->integerVal);
+    }
+    else
+    if(tree->left->type == STRING)
+    {
+         fprintf(stdout,"%s", tree->left->stringVal);
     }
     else
     {
-        if(value->type == INTEGER)
+        lexeme *value = lookup(tree->left, env);
+        if (value == NULL)
         {
-            fprintf(stdout, "%d", value->integerVal);
+            exit(1);
         }
         else
-        if(value->type == STRING)
         {
-            fprintf(stdout,"%s", value->stringVal);
+            if(value->type == INTEGER)
+            {
+                fprintf(stdout, "%d", value->integerVal);
+            }
+            else
+            if(value->type == STRING)
+            {
+                fprintf(stdout,"%s", value->stringVal);
+            }
         }
-    }
+    }   
     return tree;
 }
 
@@ -177,7 +202,9 @@ lexeme* eval (lexeme* tree, lexeme* env)
         case SET:
             return evalSet(tree, env);
         case LAMBDA:
-            return extend(tree->left, NULL, env);
+            //return extend(tree->left, NULL, env);+
+            tree->definingEnv = env;
+            return tree;
         case DEFINE:
             return evalVarDefine(tree, env);
         case DISPLAY:
@@ -226,26 +253,33 @@ int main (int argc, char** argv)
     // var3->type = VARIABLE;
     // var3->name = "Var3";
 
+    // lexeme *token4 = malloc(sizeof(lexeme));
+    // token4->type = INTEGER;
+    // token4->integerVal = 844;
+
 
     // lexeme *env  = createEnv();
     // insert(var, token, env);
     // insert(var2, token2, env);
     // insert(var3, token3, env);
 
-
     // printTree(stdout, env , 2);
-    // token2->integerVal = 894;
 
-    //  update(var2, token2, env);
+    // update(var2, token4, env);
     // printTree(stdout, env , 2);
-    
 
-    // lexeme *var4 = malloc(sizeof(lexeme));
-    // var4->type = VARIABLE;
-    // var4->name = "Var4";
+    // // token2->integerVal = 894;
+
+    // //  update(var2, token2, env);
+    // // printTree(stdout, env , 2);
+    // // Display( stdout,  lookup(var2, env));
+
+    //  lexeme *var4 = malloc(sizeof(lexeme));
+    //  var4->type = VARIABLE;
+    //  var4->name = "Var4";
 
 
-    //  lexeme *value = lookup(var4, env);
+    // //  lexeme *value = lookup(var4, env);
    
     
 

@@ -313,6 +313,8 @@ void Display ( FILE *out, lexeme *l)
         fprintf(out, "Environment\n" );
     else if (l->type == TABLE)
         fprintf(out, "Table\n" );
+    else if(l->type == ARG)
+        fprintf(out, "ARG1\n" );
     else       
     fprintf(out, "%s \n", s);
 }

@@ -245,8 +245,6 @@ lexeme* optionalArgs()
     else
     {
     match(CPAREN);
-    match(OBRACKET);
-    t->right = functionBody();
     return t;
     }
 }
@@ -284,8 +282,12 @@ lexeme* function ()
        return t;
     }
     else
-  t->left =  optionalArgs();
-  return t;
+    {
+    t->left =  optionalArgs();
+    match(OBRACKET);
+    t->right = functionBody();
+    return t;
+    }
 
 }
 
