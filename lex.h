@@ -49,7 +49,8 @@ typedef enum
     DISPLAY,
     ENV,
     TABLE,
-    ARG, 
+    ARG,
+    MODULUS,
     UNKNOWN
     
 } types;

@@ -164,6 +164,8 @@ lexeme* lex(FILE *file)
         return newLex(OBRACKET);
     case '}':
         return newLex(CBRACKET);
+    case '%':
+        return newLex(MODULUS);
     case ';':
         return newLex(SEMICOLON);
     case '=':
@@ -232,6 +234,9 @@ void Display ( FILE *out, lexeme *l)
             break;
         case DIVIDES:
             s = "Divides";
+            break;
+        case MODULUS:
+            s = "Modulus";
             break;
         case OBRACKET:
             s = "Open Bracket";

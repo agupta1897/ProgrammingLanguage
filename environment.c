@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-#include "environment.h"
+#include"environment.h"
 #include"recognizer.h"
 
 lexeme* insert (lexeme *inputvar, lexeme *inputvalue, lexeme *env )
@@ -32,7 +32,13 @@ lexeme * lookup( lexeme *variable, lexeme* env)
        {
            if(strcmp(vars->name, variable->name ) == 0)
            {
-               
+                if(vals == NULL)
+                {
+                    fprintf(stdout, "VALLS IS NULL\n");
+  
+                }
+            //    fprintf(stdout, "testing*************************\n");
+            //    Display(stdout, vals);
               return vals-> left;
            }   
         vars = vars->left;
@@ -84,16 +90,25 @@ lexeme * newArgToken(){
 }
 
 
-lexeme * remove1( lexeme* valList)
+
+
+lexeme* copier(lexeme* var)
 {
-    lexeme* head = valList;
-    while(valList != NULL)
+    if(var!= NULL)
     {
-        valList->left->right = NULL;
-        valList = valList->right;
-    }
-    return head;
+    lexeme * temp = malloc (sizeof(lexeme));
+    temp-> name = var->name;
+    temp-> stringVal = var->stringVal;
+    temp-> integerVal= var->integerVal;
+    temp-> type = var->type;
+    temp-> definingEnv = var->definingEnv;
+    temp-> lineNum = var->lineNum;
+
+    return temp;
+    }   
+return NULL;
 }
+
 
 lexeme * updateValList( lexeme* valList )
 {
@@ -103,19 +118,20 @@ lexeme * updateValList( lexeme* valList )
     {
         lexeme* head = newArgToken();
         lexeme* ptr= head;
-        ptr->left = valList;
-        
+        ptr->left = copier (valList);
+
         valList = valList->right;
         while(valList !=NULL)
         {
             ptr->right = newArgToken();
-            ptr->right->left = valList;
+            ptr->right->left = copier(valList);
             ptr = ptr->right;
             valList= valList->right;
         }
-        return remove1(head);
+        return head;
     }
 }
+
 
 lexeme * extend (lexeme* varList, lexeme * valList, lexeme *env)
 {
@@ -123,14 +139,16 @@ lexeme * extend (lexeme* varList, lexeme * valList, lexeme *env)
     lexeme *t = newLex(ENV);
     t->right = env;
     t->left = newLex(TABLE);
+    lexeme *temp = updateValList(valList);
 
-   // printTree( stdout, updateValList(valList) , 2 );
-
-  //  printf("DONE\n");
+    copier(varList);
+    //printf("DONE\n");
     t->left->left = varList;
-    t->left->right =  updateValList(valList);
-    return t;
-
+    t->left->right =  temp;
+   
+    // printf("Printing Environment: \n");
+    // printTree( stdout, t, 2 );
+     return t;
 }
 
 lexeme *createEnv()

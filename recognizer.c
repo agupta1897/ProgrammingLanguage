@@ -93,6 +93,10 @@ int minusPending()
 {
     return check(MINUS);
 }
+int modulusPending()
+{
+    return check(MODULUS);
+}
 int oparenPending()
 {
     return check(OPAREN);
@@ -178,6 +182,7 @@ lexeme* restofExp()
     if(plusPending()) t = match(PLUS); else
     if(dividesPending()) t= match(DIVIDES); else
     if(timesPending()) t= match(TIMES); else
+    if(modulusPending()) t=match(MODULUS); else
     t= match(MINUS);
 
     if(oparenPending()) t->left = mathExp();
@@ -423,8 +428,10 @@ lexeme * iffunc()
             match(CPAREN);        
             }
             else
+            {
             t->left->right->right = restofIfCond();
             match(CPAREN);
+            }
     }
     else
     {
