@@ -10,7 +10,35 @@ lexeme* eval (lexeme* tree, lexeme* env);
 lexeme *evalMath(lexeme *tree, lexeme *env);
 lexeme *evalSimpleOp( lexeme* tree, lexeme *env, lexeme* eleftOparant);
 lexeme* evaluateCond( lexeme* tree, lexeme* env);
-lexeme *evalVarDefine(lexeme *tree, lexeme *env)
+
+lexeme* evalDefArray(lexeme *tree, lexeme *env)
+{
+    lexeme* var = tree->left;
+    lexeme* val = eval(tree->right,env);
+    int size  = val->integerVal;
+    lexeme *values = tree->right->left;
+    val->array = malloc( (sizeof(lexeme))*((val->integerVal) + 1));
+
+    int index = 0;
+    while(values!=NULL )
+    {
+        if(index >= size)
+        {
+            fprintf(stdout, "SYMANTIC ERROR: Increase the Size of the Array! - Current Size: %d\n", size);
+           
+            if(tree->left->lineNum != 0)
+            fprintf(stdout, "Line No: %d\n", tree->left->lineNum);
+            exit(1);
+        }
+        val->array[index] = eval(values, env);
+        index++;
+        values = values->left;
+    }
+    val->array[index] = newLex(Null);
+    return insert(var, eval(val, env), env );
+}
+
+ lexeme *evalVarDefine(lexeme *tree, lexeme *env)
 {
     lexeme* var = tree->left;
 
@@ -32,12 +60,13 @@ lexeme *evalSet (lexeme *tree, lexeme *env)
 
     lexeme* var = tree->left;
     lexeme* val;
-    if(tree->right->type == MATH)
-    {
-        val = evalMath(tree->right, env);
-    }
-    else
-    val = tree->right;
+    Display(stdout, var);
+    printf(" Printing The Set Value:");
+    printTree(stdout, tree->right,1);
+    val = eval(tree->right, env);
+    Display(stdout, var);
+    printf("Printing The Set Value after evaluation:");
+    printTree(stdout, val,1);
     update(var, val, env);
     return tree;
 }
@@ -106,8 +135,15 @@ lexeme* evalDivides( lexeme* tree, lexeme* env, lexeme* eleftOparant)
 
 lexeme* copier1(lexeme* var)
 {
+
     if(var!= NULL)
     {
+    if(var->type == LAMBDA)
+    {
+        lexeme *head = newLex(ARG);
+        head->left = var;
+        return head;
+    }
     lexeme * temp = malloc (sizeof(lexeme));
     temp-> name = var->name;
     temp-> stringVal = var->stringVal;
@@ -116,7 +152,9 @@ lexeme* copier1(lexeme* var)
     temp-> definingEnv = var->definingEnv;
     temp-> lineNum = var->lineNum;
 
-    return temp;
+    lexeme *head = newLex(ARG);
+    head->left = temp;
+    return head;
     }   
 return NULL;
 }
@@ -132,26 +170,31 @@ lexeme* evalArgs(lexeme* list, lexeme* env)
     {
        lexeme *newList;
        lexeme *head;
-       if( list->type == VARIABLE)
+    //    if(list->type ==LAMBDA)
+    //    {
+    //         return list;
+    //    }
+    //    else
+       if( list->left->type == VARIABLE)
        {
-           newList = copier1 (lookup(list, env));  
+           newList = copier1 (lookup(list->left, env));
            head = newList;
         }
         else
-            newList = copier1(list);
+            newList = copier1(list->left);
             head = newList;
         
          while(list->right != NULL)
          {
              list = list->right;
-              if( list->type == VARIABLE)
+              if( list->left->type == VARIABLE)
                 {
-                    newList->right = copier1 (lookup(list, env));  
+                    newList->right = copier1 (lookup(list->left, env));  
                     newList = newList ->right;
                 }
                 else
                 {
-                    newList->right = copier1(list);
+                    newList->right = copier1(list->left);
                     newList = newList->right;
                 }
         }
@@ -163,15 +206,20 @@ lexeme* evalArgs(lexeme* list, lexeme* env)
 lexeme* evalFunc( lexeme *body, lexeme*env)
 {
     lexeme* result;
-    while (body != NULL)
-    {
-        result = eval(body, env);
-        body = body->right;
-    }
-    
+    lexeme*body1 = body;
+    // printf("PRINTING BODY OF FUNCTION CALL");
+    // printTree(stdout, body1, 2);
+    result = eval(body, env);
     //Display(stdout, result);
+    if(result== NULL)
+    {
+        fprintf(stdout, "Result in NULL");
+    }
+    // fprintf(stdout, "Result to call:" );
+    // Display(stdout, result);
     return result;
 }
+
 
 lexeme* evalCall( lexeme* tree, lexeme *env)
 {
@@ -186,7 +234,29 @@ lexeme* evalCall( lexeme* tree, lexeme *env)
     //  printf("Printing Value List after evalArrgs\n");
     // printTree( stdout,tree->right , 2 );
 
+
     return evalFunc(body, extendedEnv);
+}
+
+lexeme* evalCallArray( lexeme* tree, lexeme *env)
+{
+  lexeme *x = lookup(tree->left, env);
+  return x->array[eval(tree->right, env)->integerVal];
+}
+
+lexeme* evalSetArray(lexeme* tree, lexeme* env)
+{
+    lexeme *x = lookup(tree->left, env);
+    int index = eval(tree->right, env)->integerVal;
+    if  (x->integerVal <=  index)
+    {
+        fprintf(stdout, "SIMANTIC ERROR: Increase the Size of the Array! - Current Size: %d\n", x->integerVal);
+        if(tree->left->lineNum != 0)
+        fprintf(stdout, "Line No: %d\n", tree->left->lineNum);
+    }
+    lexeme * evaluatedVal = eval(tree->right->left, env);
+    x->array[index] = evaluatedVal;
+    return tree;
 }
 
 lexeme* evalTimes( lexeme* tree, lexeme* env, lexeme* eleftOparant)
@@ -543,15 +613,13 @@ lexeme * evalIf(lexeme* tree, lexeme *env)
     {
         //False
         if(tree->right->right !=NULL)
-       eval(tree->right->right, env);
+       return eval(tree->right->right, env);
        else
        return tree;
     }
     else
     //TRUE
-    eval(tree->right->left, env);
-
-    return tree;
+    return eval(tree->right->left, env);
         
 }
 
@@ -574,6 +642,7 @@ lexeme * evalWhile(lexeme* tree, lexeme* env )
 
 lexeme *evalDisplay(lexeme *tree, lexeme *env)
 {
+    
     if(tree->left->type == INTEGER)
     {
         fprintf(stdout, "%d", tree->left->integerVal);
@@ -582,17 +651,20 @@ lexeme *evalDisplay(lexeme *tree, lexeme *env)
     if(tree->left->type == STRING)
     {
          fprintf(stdout,"%s", tree->left->stringVal);
-    }
+        }
     else
-    if(tree->left->type == VARIABLE)
+    if(tree->left->type == VARIABLE || tree->left->type == CALLARRAY)
     {
         lexeme *value = eval(tree->left, env);
+       
         if (value == NULL)
         {
+            fprintf(stdout, "VAlue was null");
             exit(1);
         }
         else
         {
+             
             if(value->type == INTEGER)
             {
                 fprintf(stdout, "%d", value->integerVal);
@@ -602,6 +674,13 @@ lexeme *evalDisplay(lexeme *tree, lexeme *env)
             {
                 fprintf(stdout,"%s", value->stringVal);
             }
+            else
+            {
+                 fprintf(stdout, "Got : \n");
+                 printTree(stdout, value, 1);
+                 Display(stdout, value );
+            }
+            
         }
     }
     else
@@ -621,13 +700,21 @@ lexeme* eval (lexeme* tree, lexeme* env)
     switch(tree->type)
     {
         case NEXT:
-            eval(tree->left, env);
-            if(tree->right != NULL)
+            while(tree->right!=NULL)
             {
-                tree = tree->right;
-                eval(tree, env);
+                eval(tree->left, env);
+                tree= tree->right;
             }
-            return NULL;
+            return eval(tree->left, env);
+          
+
+            // eval(tree->left, env);
+            // if(tree->right != NULL)
+            // {
+            //     tree = tree->right;
+            //     eval(tree, env);
+            // }
+            // return NULL;
         case MATH:
             return evalMath(tree, env);
 
@@ -643,16 +730,23 @@ lexeme* eval (lexeme* tree, lexeme* env)
             return tree;
         case IF:
             return evalIf(tree, env);
+        case DEFARRAY:
+            return evalDefArray(tree, env);
         case DEFINE:
             return evalVarDefine(tree, env);
         case DISPLAY:
             return evalDisplay(tree, env);
         case CALL:
             return evalCall(tree, env);
+        case CALLARRAY:
+            return evalCallArray(tree, env);
+        case SETARRAY:
+            return evalSetArray(tree, env);
         case VARIABLE:
             return lookup(tree, env);
         case WHILE:
             return evalWhile(tree, env);
+        
         default:
             return tree;
     }
@@ -663,7 +757,7 @@ int main (int argc, char** argv)
 {
     FILE *fp = fopen(argv[1],"r");
     lexeme *tree = recognize(fp);
-    //printTree(stdout, tree->right, 2);
+    printTree(stdout, tree->right, 2);
     lexeme* env = createEnv();
     eval(tree->right, env );
     //printTree(stdout, env, 2);

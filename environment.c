@@ -139,12 +139,12 @@ lexeme * extend (lexeme* varList, lexeme * valList, lexeme *env)
     lexeme *t = newLex(ENV);
     t->right = env;
     t->left = newLex(TABLE);
-    lexeme *temp = updateValList(valList);
+    //lexeme *temp = updateValList(valList);
 
-    copier(varList);
+   // copier(varList);
     //printf("DONE\n");
     t->left->left = varList;
-    t->left->right =  temp;
+    t->left->right =  valList;
    
     // printf("Printing Environment: \n");
     // printTree( stdout, t, 2 );

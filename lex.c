@@ -120,6 +120,7 @@ lexeme* newVariableLex ( FILE* fp)
     if( strcasecmp(keyword, "defarray") == 0) token->type = DEFARRAY; else
     if( strcasecmp(keyword, "callarray") == 0) token->type = CALLARRAY; else
     if( strcasecmp(keyword, "display") == 0) token->type = DISPLAY; else
+    if( strcasecmp(keyword, "setarray") == 0) token->type = SETARRAY; else
     if( strcasecmp (keyword, "null") == 0) token->type = Null;
      else
     {
@@ -308,6 +309,8 @@ void Display ( FILE *out, lexeme *l)
         fprintf(out, "MATHEXP\n" );
     else if (l->type == CALLARRAY)
         fprintf(out, "CALL ARRAY\n" );
+    else if (l->type == SETARRAY)
+        fprintf(out, "SET ARRAY\n" );
     else if (l->type == COND)
         fprintf(out, "CONDITIONAL\n" );
     else if (l->type == THEN)

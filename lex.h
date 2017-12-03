@@ -40,6 +40,7 @@ typedef enum
     LESSTHAN,
     GREATERTHAN,
     DEFARRAY,
+    SETARRAY,
     CALLARRAY,
     OSBRACKET,
     CSBRACKET,
@@ -66,6 +67,7 @@ typedef struct lexeme
         struct lexeme *right;
         struct lexeme *left;
         struct lexeme *definingEnv;
+        struct lexeme **array;
 
     } lexeme;
 

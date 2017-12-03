@@ -1,0 +1,21 @@
+
+ptionalCallArgs()
+{
+    lexeme *t;
+
+    if(callArrayPending()) t = callArray();
+    else
+    t = value();
+
+    if (commaPending()) 
+    {
+        match(COMMA);
+        t->right = optionalCallArgs();
+        return t;
+    }
+    else
+    {
+    match(CPAREN);
+    return t;
+    }
+}

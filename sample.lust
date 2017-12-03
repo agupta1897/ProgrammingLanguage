@@ -1,92 +1,182 @@
-
-def var1 = 3;
-def var2 = 3;
-
-if( (var1 % 3) equals 1)
+def cons = lambda(x , y)
 {
-      display var1;      
+      lambda(m)
+      {
+            if(m equals "car")
+            {
+                    x;
+            }
+            else
+            {
+                  if(m equals "cdr")
+                  {
+                       y;
+                  };
+            };
+
+      };
 };
-~ if(var1 equals 30 ){
+
+
+
+def car = lambda(a)
+{
+     def ans = 1;
+     display "Displaying A";
+     ~display a;
+     set ans = call a("car");
+     ans;
+};
+
+def cdr = lambda(a)
+{
+     def ans = 1;
+     set ans = call a("cdr");
+     ans;
+};
+
+
+def x = 5;
+def y = 6;
+def z = 6;
+
+set x = call cons( "$$$$$$$$$$$$$$$$$" , 2);
+display "Displaying X";
+~display x;
+set y = call car(x);
+set z = call cdr(x);
+
+display"DISPLAYIING YYYYYYY\n";
+display y;
+display"DISPLAYIING ZZZZZZZZZ\n";
+display z;
+~ def func = lambda(m)
+~ {
+~ def x = 2;
+~ def y = 3;
+~             if(m equals "car")
+~             {     
+                 
+~                    x;
+~             }
+~             else
+~             {
+~                   if(m equals "cdr")
+~                   {
+~                         display"PRINTING";
+~                         display y;
+~                   };
+~             };
+~ };
+
+~ def x = 8;
+~ set x = call func("car");
+
+~ display x;
+
+
+~ def var2 = 3;
+~ def var1 = 1;
+~ def size = 5;
+~ defarray x[size] = { 1, 2, 3, var1};
+~ def i =0;
+~ while( i < 5)
+~ {
+~       display callArray x[i];
+~      set i = (i + 1);
+~ };
+ 
+
+~ if(var2  < 6){
+~       display "\n";
 ~     display "THE Smaller NUMBER IS: \t";
-~     display var1;    
+~     display var2;    
 ~ } 
 ~ else
 ~ {
-~     display "THE Smaller NUMBER IS: \t";
-~     display var2;
+~       display "THE Smaller NUMBER IS: \t";
+~     display var1;    
 ~ };
 
-~ while( var1 < 100)
-~ {       
-~         display "Pallloooo   CHUDAAAILL    HAI !!!    ";
-~         display var1;
-~         set var1 = ( var1 + 1);
-~         display "\n";
-~ };
-~ while( var1 < 200)
-~ {       
-~         display "PAR  <3 <3 <3 AMBER AUR VISSHI <3 <3 <3 SMART HAII ";
-~         display var1;
-~         set var1 = ( var1 + 1);
-~         display "\n";
-~ };
-
-
-
+~ ~ setArray x[0] = var1; 
+~ ~ ~ display callArray x[0];
+~ def var1 = 1;
 ~ def func = lambda(arg1, arg2){
+      
 ~         def var = 5;
+~         def var3 = 7;
+~         display "\n";
+~          display var;
+         
 ~ };
-~ display var1;
 ~ set var1 = call func( 1, 1);
 ~ display var1;
 
 
-~ def func1 = lambda( name, name2, name3, name5, name6)
-~ {
-
-~         def func2 = lambda ( name3, name4)
-~         {
-                
-~                 display name3;
-~                 display name4;
-~                 display var1;
-~                 set var1 = 700;
-~         };
-~         call func2 ( name, "99 ");
-~         display name;
-~         display name2; 
-~         ~display name4;
-~         call func2 (2, 3);    
+~ set var1 = 95;
+~ while( var1 < 100)
+~ {       
+~         display "Mason is a Freshmen!";
+~         display var1;
+~         set var1 = ( var1 + 1);
+~         display "\n";
 ~ };
-~ def name1 = "XYZ";
-~ def name2 = "1ABC";
-~ call func1 (name1, name2, 5, 5 , name2);
-
-~ ~display name1;
-
-~ display var1;
-
-
-~display 3;
-~ call func1( 2, 4);
-
-
-~ display x;
-~ display y;
-
-~ set name = (25 + (35 - 45));
-~ set name = 35;
-~ def string1 = "Hello how are you";
-~ set name = ( name + (3)); 
 
 
 
-~ defarray func1 [name1];
 
-~  while(callArray x[i] > callArray y[j])
-~  {
-~   def name1 = 34 ;
-~  };
-~ callArray func1[2];
+~ ~ def func = lambda(arg1, arg2){
+~ ~         def var = 5;
+~ ~ };
+
+
+
+~ ~ ~ def func1 = lambda( name, name2, name3, name5, name6)
+~ ~ ~ {
+
+~ ~ ~         def func2 = lambda ( name3, name4)
+~ ~ ~         {
+                
+~ ~ ~                 display name3;
+~ ~ ~                 display name4;
+~ ~ ~                 display var1;
+~ ~ ~                 set var1 = 700;
+~ ~ ~         };
+~ ~ ~         call func2 ( name, "99 ");
+~ ~ ~         display name;
+~ ~ ~         display name2; 
+~ ~ ~         ~display name4;
+~ ~ ~         call func2 (2, 3);    
+~ ~ ~ };
+~ ~ ~ def name1 = "XYZ";
+~ ~ ~ def name2 = "1ABC";
+~ ~ ~ call func1 (name1, name2, 5, 5 , name2);
+
+~ ~ ~ ~display name1;
+
+~ ~ ~ display var1;
+
+
+~ ~ ~display 3;
+~ ~ ~ call func1( 2, 4);
+
+
+~ ~ ~ display x;
+~ ~ ~ display y;
+
+~ ~ ~ set name = (25 + (35 - 45));
+~ ~ ~ set name = 35;
+~ ~ ~ def string1 = "Hello how are you";
+~ ~ ~ set name = ( name + (3)); 
+
+
+
+~ ~ ~ defarray func1 [name1];
+
+~ ~ ~  while(callArray x[i] > callArray y[j])
+~ ~ ~  {
+~ ~ ~   def name1 = 34 ;
+~ ~ ~  };
+~ ~ ~ callArray func1[2];
 
 

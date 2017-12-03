@@ -160,9 +160,19 @@ int callArrayPending()
     return check(CALLARRAY);
 }
 
+int obracketPending()
+{
+    return check(OBRACKET);
+}
+
 int displaypending()
 {
     return check(DISPLAY);
+}
+
+int setArrayPending()
+{
+    return check(SETARRAY);
 }
 
 lexeme* mathExp();
@@ -257,10 +267,10 @@ lexeme* optionalArgs()
 lexeme* optionalCallArgs()
 {
     lexeme *t;
-
-    if(callArrayPending()) t = callArray();
+     t= newLex(ARG);
+    if(callArrayPending()) t->left = callArray();
     else
-    t = value();
+    t->left = value();
 
     if (commaPending()) 
     {
@@ -336,9 +346,12 @@ lexeme* callArray()
      lexeme * t = match(CALLARRAY);
     t->left = match (VARIABLE);
     match(OSBRACKET);
-    if(integerPending()) t->right = match(INTEGER);
-    else
+    if(integerPending())
+     t->right = match(INTEGER);
+    else if(variablePending())
     t->right = match(VARIABLE);
+    else
+    t->right = mathExp();
     match(CSBRACKET);
     return t;
 }
@@ -498,6 +511,18 @@ lexeme*  whileloop()
    return t;
 }
 
+lexeme *optionalArrayElem()
+{   
+    lexeme *t;
+   
+    t = value();
+    if(commaPending())
+    {
+        match(COMMA);
+        t->left = optionalArrayElem();
+    }
+    return t;
+}
 lexeme* array()
 {
     lexeme* t= match(DEFARRAY);
@@ -507,13 +532,73 @@ lexeme* array()
     t->right = match(INTEGER);
     else
     t->right = match(VARIABLE);
+
+  
     match(CSBRACKET);
+      match(ASSIGN);
+    if(obracketPending())
+    {
+        match(OBRACKET);
+        t->right->left = optionalArrayElem();
+        match(CBRACKET);
+    }
     return t;
+}
+
+lexeme * setArray(){
+    lexeme* t= match(SETARRAY);
+    t->left = match(VARIABLE);
+    match(OSBRACKET);
+
+    if(integerPending())
+    t->right = match(INTEGER);
+    else
+    if(variablePending())
+    t->right = match(VARIABLE);
+    else
+    t->right = mathExp();
+
+    match(CSBRACKET);
+    match(ASSIGN);
+
+    if(oparenPending())
+    {
+    t->right->left = mathExp;
+    }
+    else
+    t->right->left = value();
+
+  return t;
 }
 
 lexeme* statement()
 {
     lexeme* t = newLex(NEXT);
+    if(integerPending())
+    {
+        t->left = match(INTEGER);
+    }
+    else
+    if(stringPending())
+    {
+        t->left = match(STRING);
+    }
+    else
+    if(oparenPending())
+    {
+        t->left = mathExp();
+    }
+    else
+    if(variablePending())
+    {
+        t->left = match(VARIABLE);
+    }
+    else
+    if(lambdaPending())
+    {
+        t->left = function();
+    }
+    else
     if(definitionPending()) 
         t->left = definition();
      else
@@ -530,6 +615,9 @@ lexeme* statement()
     if (callArrayPending())
      t->left = callArray();
     else
+    if(setArrayPending())
+        t->left = setArray();
+    else
     if(displaypending())
     t->left = displaying();
     match(SEMICOLON);
@@ -545,7 +633,7 @@ lexeme* program( lexeme *t)
     if (flag1 == 0)
     {
         parent = t;
-        flag1 =1;
+        flag1 = 1;
     }
     if (check(END_OF_INPUT)) return parent;
     else
