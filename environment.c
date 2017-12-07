@@ -46,7 +46,8 @@ lexeme * lookup( lexeme *variable, lexeme* env)
         }
     env = env->right;
     }
-fprintf(stderr, " Variable: %s is Undefined!", variable->name );
+fprintf(stderr, " Variable: %s is Undefined!\n", variable->name );
+exit(1);
 return NULL;
 }
 
@@ -92,45 +93,45 @@ lexeme * newArgToken(){
 
 
 
-lexeme* copier(lexeme* var)
-{
-    if(var!= NULL)
-    {
-    lexeme * temp = malloc (sizeof(lexeme));
-    temp-> name = var->name;
-    temp-> stringVal = var->stringVal;
-    temp-> integerVal= var->integerVal;
-    temp-> type = var->type;
-    temp-> definingEnv = var->definingEnv;
-    temp-> lineNum = var->lineNum;
+// lexeme* copier(lexeme* var)
+// {
+//     if(var!= NULL)
+//     {
+//     lexeme * temp = malloc (sizeof(lexeme));
+//     temp-> name = var->name;
+//     temp-> stringVal = var->stringVal;
+//     temp-> integerVal= var->integerVal;
+//     temp-> type = var->type;
+//     temp-> definingEnv = var->definingEnv;
+//     temp-> lineNum = var->lineNum;
 
-    return temp;
-    }   
-return NULL;
-}
+//     return temp;
+//     }   
+// return NULL;
+// }
 
 
-lexeme * updateValList( lexeme* valList )
-{
-    if(valList == NULL)
-    return NULL;
-    else
-    {
-        lexeme* head = newArgToken();
-        lexeme* ptr= head;
-        ptr->left = copier (valList);
+// lexeme * updateValList( lexeme* valList )
+// {
+//     if(valList == NULL)
+//     return NULL;
+//     else
+//     {
+//         lexeme* head = newArgToken();
+//         lexeme* ptr= head;
+//         ptr->left = copier (valList);
 
-        valList = valList->right;
-        while(valList !=NULL)
-        {
-            ptr->right = newArgToken();
-            ptr->right->left = copier(valList);
-            ptr = ptr->right;
-            valList= valList->right;
-        }
-        return head;
-    }
-}
+//         valList = valList->right;
+//         while(valList !=NULL)
+//         {
+//             ptr->right = newArgToken();
+//             ptr->right->left = copier(valList);
+//             ptr = ptr->right;
+//             valList= valList->right;
+//         }
+//         return head;
+//     }
+// }
 
 
 lexeme * extend (lexeme* varList, lexeme * valList, lexeme *env)

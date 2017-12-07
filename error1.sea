@@ -1,0 +1,2 @@
+def x = "Display line is missing a semicolon";
+display x

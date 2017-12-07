@@ -1,0 +1,8 @@
+`comparison is made between wrong types
+`Error displays line numbers where the oparants are defined. 
+def x = 3;
+
+if( x > "String")
+{
+    display "This should not be displayed";
+};

@@ -16,11 +16,11 @@ int ch;
 
 /* read chars until a non-whitespace character is encountered */
 
-while ((ch = fgetc(fp)) != EOF && (isspace(ch) || ch == '~'))
+while ((ch = fgetc(fp)) != EOF && (isspace(ch) || ch == '`'))
 {
     if (ch == '\n')
     lineNum++;
-    if (ch == '~')
+    if (ch == '`')
     {
     readLine(fp);
     lineNum++;
@@ -66,7 +66,7 @@ lexeme* newLex (types t )
     return token;
 }
 
-lexeme* newIntLex ( FILE* fp)
+lexeme* newIntLex ( FILE* fp, int negative)
 {
     lexeme *token = malloc(sizeof(lexeme));
     if (token == 0)
@@ -76,6 +76,9 @@ lexeme* newIntLex ( FILE* fp)
     }
     int value = 0;
     fscanf(fp,"%d",&value);
+    if(negative == 1)
+    token->integerVal = value* -1;
+    else
     token->integerVal = value;
     token->type = INTEGER;
     token->lineNum = lineNum;
@@ -158,7 +161,17 @@ lexeme* lex(FILE *file)
     case '*':
         return newLex(TIMES);
     case '-':
+        ch = fgetc(fp);
+        if (isdigit(ch))
+        {
+            ungetc(ch,fp);
+            return newIntLex(fp, 1);
+        }
+        else
+        {
+        ungetc(ch,fp);
         return newLex(MINUS);
+        }
     case '/': 
         return newLex(DIVIDES);
     case '{':
@@ -183,7 +196,7 @@ lexeme* lex(FILE *file)
         if(isdigit(ch))
         {
          ungetc(ch,fp);
-         return newIntLex(fp);
+         return newIntLex(fp, 0);
         }
         else
         if( ch == '\"')
@@ -198,7 +211,7 @@ lexeme* lex(FILE *file)
             return newVariableLex(fp);
         }
         else
-        if( ch=='~')
+        if( ch=='`')
         {
             ungetc(ch,fp);
             skipWhiteSpace(fp);
@@ -207,6 +220,41 @@ lexeme* lex(FILE *file)
         }
         return newLex(UNKNOWN);
     }
+}
+
+void displayFunc(lexeme* value)
+{
+fprintf(stdout, "Function ID: %d  ", value->integerVal);
+                
+                fprintf(stdout, "<");
+                while(value->left != NULL)
+                {    
+                    fprintf(stdout,"%s" ,value->left->name);
+                    value = value->left;
+                }
+                fprintf(stdout, ">\n\n");
+            }
+            
+void displayEnv(FILE *fp, lexeme *tree)
+{
+    printf("\n Displaying Environment:\n");
+    if(tree->left!= NULL)
+    {
+        lexeme *var = tree->left->left;
+        lexeme *val = tree->left->right;
+        while(var != NULL)
+        {
+            Display(fp, var);
+            if(val->left->type == LAMBDA)
+            displayFunc(val->left);
+            else
+            Display(fp, val->left);
+            
+            var = var->left;
+            val = val->right;
+        }
+    }
+    printf("*********************************\n");
 }
 
 
@@ -272,7 +320,7 @@ void Display ( FILE *out, lexeme *l)
     else if (l->type == INTEGER)
         fprintf(out, "INTEGER: %d\n", l->integerVal);
     else if (l->type == VARIABLE)
-        fprintf(out, "VARIABLE NAME: %s\n", l->name);  
+        fprintf(out, "%s\n", l->name);  
     else if (l->type == COMMENT)
         fprintf(out, "COMMENT VALUE: %s\n", l->stringVal);
     else if (l->type == DEFINE)
@@ -318,11 +366,13 @@ void Display ( FILE *out, lexeme *l)
     else if (l->type == DISPLAY)
         fprintf(out, "DISPLAY\n" );
     else if (l->type == ENV)
-        fprintf(out, "Environment\n" );
+        displayEnv(stdout, l );
     else if (l->type == TABLE)
         fprintf(out, "Table\n" );
     else if(l->type == ARG)
         fprintf(out, "ARG1\n" );
+    else if(l->type == CLOSURE)
+        fprintf(out, "CLOSURE\n" );
     else       
     fprintf(out, "%s \n", s);
 }

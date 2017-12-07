@@ -1,0 +1,2 @@
+`Trying to add elements more than the size of the array
+defarray x[5] = {1, 2, 3, 4, 5, 6};

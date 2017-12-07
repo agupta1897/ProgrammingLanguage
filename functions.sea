@@ -1,0 +1,47 @@
+def cons = lambda(x , y)
+{
+      def func1 = lambda(m)
+      {
+            if(m equals "car")
+            {
+                    x;
+            }
+            else
+            {
+                  if(m equals "cdr")
+                  {
+                       y;
+                  };
+            };
+
+      };
+      func1;
+};
+
+def car = lambda(a)
+{
+     def ans = call a("car");
+     ans;
+};
+
+def cdr = lambda(a)
+{
+    
+     def ans = call a("cdr");
+     ans;
+};
+
+`cons return a function
+def x = call cons(1, 2);
+
+`passing function x as a parameter to cons function
+def z = call cons (3, x);
+display "Scope 1: ";
+display call car(z);
+def y = call cdr(z);
+display "\nScope 2: ";
+display call car(y);
+display ",";
+display call cdr(y);
+
+

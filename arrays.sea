@@ -1,0 +1,42 @@
+def var1 = 4;
+def var5 = 5;
+def size = 5;
+
+display "\nCreating array with index as a variable and displaying it:\n";
+
+defarray x[size] = { 1, 2, 3, var1, 5};
+def i =0;
+
+while( i < size)
+{
+    display callArray x[i];
+     set i = (i + 1);
+};
+
+display "\nCalling array index with a mathexpression:\n";
+set i = -1;
+
+while( i < (size - 1))
+{
+     
+     `setarray x[(2+3)] = 0;
+     display callArray x[(i+1)];
+     set i = (i + 1);
+};
+
+display "\nSetting all indexes to 0, Setting array to a new variable, displaying using new name:\n";
+set i = 0;
+def array1 = x;
+while( i < size)
+{
+    setarray x[i]= 0;
+    display callArray x[i];
+     set i = (i + 1);
+};
+
+` set i = 0;
+` while( i < size)
+` {
+`     display callArray x[i];
+`      set i = (i + 1);
+` };

@@ -1,0 +1,40 @@
+`Returns Annoynmous function that takes one parameter
+
+def cons = lambda(x , y)
+{
+    lambda(m)
+      {
+            if(m equals "car")
+            {
+                    x;
+            }
+            else
+            {
+                  if(m equals "cdr")
+                  {
+                       y;
+                  };
+            };
+
+      };
+};
+
+def car = lambda(a)
+{
+       call a("car");
+     
+};
+
+def cdr = lambda(a)
+{
+   call a("cdr");
+};
+
+`passing the anonymous function returned from call to inner cons as a parameter to the wrapping cons function
+def z = call cons (3, call cons(1, 2));
+display "Scope 1: ";
+display call car(z);
+display "\nScope 2: ";
+display call car( call cdr(z));
+display ",";
+display call cdr(call cdr(z));

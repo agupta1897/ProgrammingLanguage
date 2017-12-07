@@ -1,0 +1,2 @@
+#!/bin/bash
+./PInterpreter $1

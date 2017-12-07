@@ -1,0 +1,45 @@
+def arg = 1;
+def args = "Hello";
+def int = 0;
+if( arg equals (2 - 1) )
+{
+    display "\nYou should see this : ";
+    set int = (int + 1);
+    display int;
+}
+else
+{
+     display "\nYou shouldn't be seeing this ;'(";
+};
+
+if( arg < 2 and args equals "Hello" and  5 < 10)
+{
+    display "\nYou should see this : ";
+    set int = (int + 1);
+    display int;
+};
+
+if (arg > 999 and args equals "Hello")
+{
+    display "\nYou shouldn't be seeing this ;'(";
+}
+else
+{
+    display "\nYou should see this : ";
+    set int = (int + 1);
+    display int;
+};
+
+if (arg > 999 or args equals "Hello")
+{
+    display "\nYou should see this : ";
+    set int = (int + 1);
+    display int;
+}
+else
+{
+     display "\nYou shouldn't be seeing this ;'(";
+};
+
+
+

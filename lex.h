@@ -42,6 +42,7 @@ typedef enum
     DEFARRAY,
     SETARRAY,
     CALLARRAY,
+    CLOSURE,
     OSBRACKET,
     CSBRACKET,
     PROGRAM,
@@ -74,7 +75,8 @@ typedef struct lexeme
 extern lexeme *newLex (types type);
 extern lexeme *lex (FILE *fp);
 extern void Display (FILE* fp, lexeme *l);
-extern lexeme *newIntLex (FILE *fp);
+extern void displayEnv(FILE *fp, lexeme *tree);
+extern lexeme *newIntLex (FILE *fp, int flag);
 extern lexeme *newVariableLex (FILE *fp);
 extern lexeme *newStringLex (FILE *fp);
 //extern void recognize(FILE *fp);

@@ -178,6 +178,7 @@ int setArrayPending()
 lexeme* mathExp();
 lexeme* statement();
 lexeme* callArray();
+lexeme* call();
 
 lexeme* value()
 {
@@ -244,7 +245,7 @@ lexeme* functionBody()
     t = statement();
     t->right = functionBody();
     return t;
-}
+    }
 
 }
 
@@ -269,6 +270,10 @@ lexeme* optionalCallArgs()
     lexeme *t;
      t= newLex(ARG);
     if(callArrayPending()) t->left = callArray();
+    else
+    if(oparenPending()) t->left = mathExp();
+    else
+    if (callPending()) t->left = call();
     else
     t->left = value();
 
@@ -307,23 +312,7 @@ lexeme* function ()
 }
 
 
-lexeme* definition ()
-{
-    lexeme *t = match(DEFINE);
-    
-    t->left = match(VARIABLE);
-    match(ASSIGN);
-    if (lambdaPending())
-    {
-       t->right= function();
-       return t;
-    }
-    else
-    if(oparenPending()) t->right  = mathExp();
-    else
-    t->right = value();
-    return t;
-}     
+  
 
 lexeme* call()
 {
@@ -340,6 +329,26 @@ lexeme* call()
     return t;
     }
 }
+lexeme* definition ()
+{
+    lexeme *t = match(DEFINE);
+    
+    t->left = match(VARIABLE);
+    match(ASSIGN);
+    if (lambdaPending())
+    {
+       t->right= function();
+       return t;
+    }
+    else
+    if(oparenPending()) t->right  = mathExp();
+    else
+    if(callPending())
+    t->right = call();
+    else
+    t->right = value();
+    return t;
+}   
 
 lexeme* callArray()
   {
@@ -368,6 +377,9 @@ lexeme* assign()
     if(oparenPending()) t->right = mathExp();
     else
      if(stringPending()) t->right = match(STRING);
+    else
+    if(variablePending())
+    t->right = match(VARIABLE);
     else
      t->right = match(INTEGER);
    return t;
@@ -472,6 +484,9 @@ lexeme* displaying()
     else
     if (callArrayPending()) t->left = callArray();
     else
+    if (callPending())
+    t->left = call();
+    else
     if (oparenPending()) t->left = mathExp();
     else
     t->left = value();
@@ -553,17 +568,16 @@ lexeme * setArray(){
     if(integerPending())
     t->right = match(INTEGER);
     else
-    if(variablePending())
+   // if(variablePending())
     t->right = match(VARIABLE);
-    else
-    t->right = mathExp();
+
 
     match(CSBRACKET);
     match(ASSIGN);
 
     if(oparenPending())
     {
-    t->right->left = mathExp;
+    t->right->left = mathExp();
     }
     else
     t->right->left = value();
@@ -630,17 +644,22 @@ lexeme* parent;
 int flag1 = 0;
 lexeme* program( lexeme *t)
 {
+    lexeme *x = parent;
     if (flag1 == 0)
     {
         parent = t;
         flag1 = 1;
     }
-    if (check(END_OF_INPUT)) return parent;
-    else
+
+    if (!check(END_OF_INPUT))
     {
        t->right = statement();
-    }
-    program(t->right);
+        return program(t->right);
+        }
+    else
+    return x;
+
+    
 }
 
     void indentprinter(FILE *fp)
@@ -686,7 +705,7 @@ lexeme* recognize(FILE *file)
     currentLex = lex(fp);
     lexeme *x;
     x = program(t);
-    Display(stdout, x);
+   // Display(stdout, x);
     
     return x;
 }

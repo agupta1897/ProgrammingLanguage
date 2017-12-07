@@ -1,0 +1,37 @@
+`While Loop goes from i = 0 to i < 10
+display "Displying Iteration using fibnacci series:\n";
+
+def fib = lambda(n)
+{
+    if( n equals 0)
+    {
+        0;
+    }
+    else
+    {
+        if( n equals 1)
+        {
+            1;
+        }
+        else    
+        {
+            def j = call fib ( (n - 1) );
+            def k = call fib ( (n - 2) );
+            (k + j);
+        };
+    };
+    
+};
+
+
+def i = 0;
+def j = 11;
+while ( i < j )
+{
+display "Element ";
+display i;
+display " : ";
+display call fib (i);
+display "\n";
+set i = (i + 1);
+};
