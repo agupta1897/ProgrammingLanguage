@@ -2,6 +2,7 @@
 
 def cons = lambda(x , y)
 {
+      `Annonymous Function that will be returned and called later on
     lambda(m)
       {
             if(m equals "car")
@@ -38,3 +39,7 @@ display "\nScope 2: ";
 display call car( call cdr(z));
 display ",";
 display call cdr(call cdr(z));
+
+display "\nWe can also print functions/lambdas just like in Scam";
+`printing annonymous function
+display call cdr (z);

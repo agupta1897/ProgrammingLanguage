@@ -32,64 +32,76 @@ error1:
 	cat error1.sea
 
 error1x:
-	sea error1.sea
+	dpl error1.sea
 
 error2:
 	cat error2.sea
 
 error2x:
-	sea error2.sea
+	dpl error2.sea
 
 error3:
 	cat error3.sea
 
 error3x:
-	sea error3.sea
+	dpl error3.sea
 
 error4:
 	cat error4.sea
 
 error4x:
-	sea error4.sea
+	dpl error4.sea
 
 error5:
 	cat error5.sea
 
 error5x:
-	sea error5.sea
+	dpl error5.sea
 
 arrays:
 	cat arrays.sea
 
 arraysx:
-	sea arrays.sea
+	dpl arrays.sea
 
 conditionals:
 	cat conditionals.sea
 
 conditionalsx:
-	sea conditionals.sea
+	dpl conditionals.sea
 
 recursion:
 	cat recursion.sea
 
 recursionx:
-	sea recursion.sea
+	dpl recursion.sea
 
 iteration:
 	cat iteration.sea
 
 iterationx:
-	sea iteration.sea
+	dpl iteration.sea
 
 functions:
 	cat functions.sea
 
 functionsx:
-	sea functions.sea
+	dpl functions.sea
 
-lambdas:
+lambda:
 	cat lambdas.sea
 
-lambdasx:
-	sea lambdas.sea
+lambdax:
+	dpl lambdas.sea
+
+dictionary:
+	cat dictionary.sea
+
+dictionaryx:
+	dpl dictionary.sea
+
+problem:
+	cat problem.sea
+
+problemx:
+	dpl problem.sea

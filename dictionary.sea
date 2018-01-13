@@ -1,0 +1,356 @@
+`http://www.geeksforgeeks.org/avl-tree-set-1-insertion/
+`The following code is based on the implementation provided on the above link.
+
+
+`Since Array elements can be an Array, one can creat virtually any kind of structures using these arrays
+`Index = 0 is key, index 1 = left, index 2 = right , index 3 = height
+`Treating -9999 as a NULL VALUE;
+def newNode = lambda( key)
+{
+    defarray node[4] = {-9999}; `defing an array of size 4 and assigning first element a NULL (-9999) value
+    defarray left[4] = {-9999}; `creating a NULL Left for the AVL Tree;
+    defarray right[4] = {-9999}; `creating a NULL Right for the AVL Tree;
+    setarray node[0] = key;
+    `ELEMENTS OF A ARRAY CAN BE AN ARRAY;
+    setarray node[1] = left; `Setting the left to NULL ARRAY
+    setarray node[2] = right; `Setting the right to NULL ARRAY
+    setarray node[3] = 1;
+    node;
+};
+
+def max = lambda( a, b)
+{
+    if(a > b)
+    {
+        a;
+    }else
+    {
+        b;
+    };
+};
+
+
+
+def getkey = lambda( node)
+{
+    callarray node[0];
+};
+
+def getleft = lambda( node)
+{
+    callarray node[1];
+};
+
+def getright = lambda( node)
+{
+    callarray node[2];
+};
+
+def getheight = lambda( node)
+{
+    def key  = call getkey(node);
+    if (key equals -9999)
+    {
+        0;
+    }
+    else
+    {
+     callarray node[3];
+    };
+};
+
+def setLeft = lambda( node, value)
+{
+    setarray node[1] = value;
+
+    node;
+};
+
+def setRight = lambda( node, value)
+{
+    setarray node[2] = value;
+    node;
+};
+
+def setHeight = lambda( node, value)
+{
+    setarray node[3] = value;
+    node;
+};
+
+
+def preOrder = lambda (root)
+{
+    def nodekey = call getkey(root);
+    if (nodekey equals -9999)
+    {        
+        "nothing";
+    }
+    else
+    {
+        display call getkey (root);
+        display " ";
+        call preOrder( call getleft(root));
+        call preOrder( call getright(root));
+    };
+};
+
+
+def getBalanace = lambda(node)
+{
+    def key  = call getkey(node);
+    if (key equals -9999)
+    {
+        0;
+    }
+    else
+    {
+       def x =  call getheight( call getleft(node));
+       def y = call getheight( call getright(node));
+       (x - y);
+    };
+};
+
+
+def rightRotate = lambda ( y)
+{
+    def x = call getleft(y);
+    def TT = call getright(x);
+
+    call setRight(x, y);
+    call setLeft(y, TT);
+
+    def yheight = call max( call getheight( call getleft(y)), call getheight( call getright(y)));
+    call setHeight(y, (yheight + 1));
+    def xheight = call max( call getheight( call getleft(x)), call getheight( call getright(x)));
+    call setHeight(x, (xheight + 1));
+
+
+    x;
+
+};
+
+
+def leftRotate = lambda (x)
+{
+    def y = call getright(x);
+    def TT = call getleft(y);
+
+    call setLeft(y, x);
+    call setRight(x, TT);
+    
+    
+    def xheight = call max( call getheight( call getleft(x)), call getheight( call getright(x)));
+    call setHeight(x, (xheight + 1));
+    def yheight = call max( call getheight( call getleft(y)), call getheight( call getright(y)));
+    call setHeight(y, (yheight + 1));
+
+    y;
+};
+
+
+
+
+def insert = lambda ( node, key)
+{
+
+    def nodekey = call getkey(node);
+    if (nodekey equals -9999)
+    {        
+        `display "HI";
+       def nNode = call newNode(key);
+        nNode;
+    }
+    else
+    {
+        if(key < nodekey)
+        {
+           ` setarray node[1] = call newNode(-9999);
+            def z = call insert( call getleft(node), key);
+            call setLeft(node, z);
+
+            def nodeleft = call getleft(node);
+            def noderight = call getright(node);
+            def h = call max( call getheight(nodeleft), call getheight(noderight));
+            call setHeight(node, (1 + h ));
+            def balance = call getBalanace(node);
+            ` display "Displaying balance\n";
+            ` display balance;
+            
+            def leftskey = call getkey( call getleft(node));
+            def rightskey = call getkey( call getright(node));
+            if( balance > 1 and key <  leftskey)
+            {
+                ;
+                call rightRotate(node);
+            }
+            else
+            {    
+                
+                if( balance < -1 and key > rightskey)
+                {
+                    
+                    call leftRotate(node);
+                }
+                else
+                {
+                    if( balance > 1 and key > leftskey)
+                    {
+                        `DOUBLE ROTATION
+                        def result =  call leftRotate(call getleft(node));
+                        call setLeft(node, result);
+                        call rightRotate(node);
+                    }
+                    else
+                    {
+                        if( balance < -1 and key < rightskey)
+                        {
+                            `DOUBLE ROTATION
+                            def result =  call rightRotate(call getright(node));
+                            call setRight(node, result);
+                            call leftRotate(node);
+                        }
+                        else
+                        {
+                            node;
+                        };
+                    };
+
+                };
+
+            };
+
+           
+        }
+        else
+        {
+            if(key > nodekey)
+            {
+                
+                def z = call insert(callarray node[2], key);
+                call setRight(node, z);
+                def nodeleft = call getleft(node);
+                def noderight = call getright(node);
+                def h = call max( call getheight(nodeleft), call getheight(noderight));
+                call setHeight(node, (1 + h ));
+                def balance = call getBalanace(node);
+          
+                def leftskey = call getkey( call getleft(node));
+                def rightskey = call getkey( call getright(node));
+                if( balance > 1 and key <  leftskey)
+                {
+                   
+                    call rightRotate(node);
+                }
+                else
+                {    
+                    
+                    if( balance < -1 and key > rightskey)
+                    {
+                        
+                        call leftRotate(node);
+                    }
+                    else
+                    {
+                        if( balance > 1 and key > leftskey)
+                        {
+                           `DOUBLE ROTATION
+                            def result =  call leftRotate(call getleft(node));
+                            call setLeft(node, result);
+                            call rightRotate(node);
+                        }
+                        else
+                        {
+                            if( balance < -1 and key < rightskey)
+                            {
+                                `DOUBLE ROTATION
+                                def result =  call rightRotate(call getright(node));
+                                call setRight(node, result);
+                                call leftRotate(node);
+                            }
+                            else
+                            {
+                                node;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+};
+
+
+
+
+def lookUp = lambda(node, value)
+{
+     def nodekey = call getkey(node);
+    if (nodekey equals -9999)
+    {        
+        Display value;
+        Display ", value was not found in the tree :-( \n";
+    }
+    else
+    {
+        if(nodekey > value)
+        {
+            `Display nodekey;
+            call lookUp( call getleft(node) , value);
+        }
+        else
+        {
+            if( nodekey < value)
+            {
+                call lookUp( call getright(node) , value);
+            }
+            else
+            {
+                Display value;
+                Display " Found! Current Height in the tree : ";
+                Display call getheight(node);
+                Display "\n";
+            };
+        };
+    };
+};
+`-9999 to is sent to create the first NULL Node, Since, -9999 is the NULL Value
+def root = call newNode(-9999);
+
+display "\nInserting : 10"; 
+set root = call insert(root , 10); `Insert starts from here. 
+
+display "\nInserting : 20"; 
+set root = call insert(root , 20); 
+display "\nInserting : 30"; 
+set root = call insert(root , 30);
+display "\nInserting : 40"; 
+set root = call insert(root , 40);
+display "\nInserting : 50"; 
+set root = call insert(root , 50);
+display "\nInserting : 25"; 
+set root = call insert(root , 25);
+
+
+
+`display preserves the indentation
+  display "\nThe constructed AVL Tree would be:\n
+            30          (H = 3)
+           /  \\
+         20   40        (H = 2)
+        /  \\    \\
+       10  25    50     (H = 1)
+  ";
+
+  `A pre order display function
+  `Extra Points for drawing skills :-D 
+
+display "\nPrinting Tree in Pre Order :\n";
+call preOrder (root);
+
+
+display "\nTrying lookups: \n";
+call lookUp (root, 10);
+call lookUp (root, 30);
+call lookUp (root, 15);
+call lookUp (root, 40);

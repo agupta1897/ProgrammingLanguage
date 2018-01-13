@@ -1,6 +1,6 @@
 # ProgrammingLanguage
 
-You would need to run this command on terminal  'chmod +x sea'
+You would need to run this command on terminal  'chmod +x dpl'
 
 1. All statements will need a semicolon in the end.
 
@@ -16,8 +16,8 @@ You would need to run this command on terminal  'chmod +x sea'
         def var3 = var1;
         def funcName = lambda ( arg1, arg2)
         {
-            body;
-        }; (Function)
+            `body;
+        }; `(Function)
 
     set - sets a variable;
         set var1 = var2;
@@ -66,7 +66,7 @@ You would need to run this command on terminal  'chmod +x sea'
         } 
         else 
         {
-            body not executed  - ondition is False
+            body not executed  - condition is False
         }; 
 
    
@@ -110,7 +110,7 @@ You would need to run this command on terminal  'chmod +x sea'
     defArray - defines an array, takes size and optional elements
     SetArray - sets the array's elememnt at the given index
     callArray- gets the array's elememnt at the given index
-    
+    Arrays elements can be a Array. This feature helps to do linking and users can design complex structures. 
 
     defarray x[size] = { 1, 2, 3, var1, 5};
     def i =0;

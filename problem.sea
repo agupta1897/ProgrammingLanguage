@@ -1,0 +1,105 @@
+def cons = lambda(x , y)
+{
+      lambda(m)
+      {
+            if(m equals "car")
+            {
+                    x;
+            }
+            else
+            {
+                  if(m equals "cdr")
+                  {
+                       y;
+                  };
+            };
+
+      };
+};
+
+def car = lambda(a)
+{
+     def ans = call a("car");
+     ans;
+};
+
+def cdr = lambda(a)
+{
+    
+     def ans = call a("cdr");
+     call ans();
+};  
+
+
+def integers = lambda(x){
+    def y = lambda()
+    {
+         call integers( (x + 1) );
+    };
+    call cons(x, y);
+};
+
+def displayStream = lambda(s, n)
+{
+    if( n equals 0)
+    {
+     call car (s);
+    }
+    else
+    {
+       ` def x =  call cdr (s);
+        display call car(s);
+        display "\n";
+        call displayStream (  call cdr (s) , ( n - 1));
+    };
+};
+
+
+
+r
+ def streamfilter = lambda( pred, stream)
+ { 
+     def x = call pred (call car (stream));
+     `display x;
+     if( x equals 1)
+     {
+        `display call car (stream);
+        def lambdax = lambda()
+        {
+             call streamfilter( pred, call cdr (stream));
+        };
+        call cons( call car(stream) ,lambdax);
+     }
+     else
+     {
+      call streamfilter (pred, call cdr (stream));
+     };
+ };
+
+ def sieve = lambda ( stream)
+ {
+     def pred = lambda (x)
+     {
+         `display x;
+         def y = call car (stream);
+         if( (x % y) equals 0 )
+         {
+             0;
+         }
+         else
+         {
+             1;
+         };
+     };
+    def lambdax = lambda()
+    {
+        call sieve( call streamfilter (pred, call cdr(stream)));
+    };
+    call cons( call car (stream), lambdax);
+ };
+def primes = call sieve ( call integers(2));
+
+def x = call displayStream(primes, 50); 
+`returns the 51sth Prime, to match the SICP's Behaviour Page 327
+`calling displayStream with 0 will give '2' (First prime Number);
+display x;

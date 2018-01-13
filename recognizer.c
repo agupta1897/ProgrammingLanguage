@@ -8,7 +8,6 @@
 #include<string.h>
 #include<strings.h>
 
-
 lexeme* currentLex;
 FILE *fp;
 
@@ -346,6 +345,9 @@ lexeme* definition ()
     if(callPending())
     t->right = call();
     else
+    if(callArrayPending())
+    t->right = callArray();
+    else
     t->right = value();
     return t;
 }   
@@ -580,6 +582,11 @@ lexeme * setArray(){
     t->right->left = mathExp();
     }
     else
+    if(callPending())
+    {
+        t->right->left = call();
+    }
+    else
     t->right->left = value();
 
   return t;
@@ -653,8 +660,19 @@ lexeme* program( lexeme *t)
 
     if (!check(END_OF_INPUT))
     {
-       t->right = statement();
+
+        // if(ifPending())
+        // {   
+        // lexeme* t1 = newLex(NEXT);
+
+        //    t1->left=  iffunc();
+        //    t->right =t1;
+        //    return program (t->right);
+        // }
+        
+        t->right = statement();
         return program(t->right);
+
         }
     else
     return x;

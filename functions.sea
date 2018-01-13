@@ -44,4 +44,8 @@ display call car(y);
 display ",";
 display call cdr(y);
 
+display "\nWe can also print functions/lambdas just like in Scam";
+`printing func1, this feature helps in debugging
+display call cdr (z);
+
 

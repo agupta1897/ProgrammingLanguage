@@ -1,5 +1,5 @@
 `comparison is made between wrong types
-`Error displays line numbers where the oparants are defined. 
+`Error displays line numbers where the oparants are defined followed by where the comparison is made
 def x = 3;
 
 if( x > "String")

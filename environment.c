@@ -34,8 +34,8 @@ lexeme * lookup( lexeme *variable, lexeme* env)
            {
                 if(vals == NULL)
                 {
-                    fprintf(stdout, "VALLS IS NULL\n");
-  
+                    fprintf(stderr, "FATAL ERROR: Value for Variable %s is NULL or Not Found\n", variable->name);
+                    exit(1);
                 }
             //    fprintf(stdout, "testing*************************\n");
             //    Display(stdout, vals);
@@ -46,7 +46,11 @@ lexeme * lookup( lexeme *variable, lexeme* env)
         }
     env = env->right;
     }
-fprintf(stderr, " Variable: %s is Undefined!\n", variable->name );
+fprintf(stdout, " Variable: %s is Undefined!\n", variable->name );
+if(variable->lineNum != 0 )
+{
+    fprintf(stdout, "Line Number %d\n", variable->lineNum);
+}
 exit(1);
 return NULL;
 }

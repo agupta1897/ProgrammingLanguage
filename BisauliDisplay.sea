@@ -1,0 +1,23 @@
+display "Bisuali Chutia HAI";
+def x = "Bisuali Chutia HAI";
+
+def m = 2;
+while( m < 100)
+{
+    display x;
+    display "\n";
+    display m;
+    set m = ( m + 1);
+};
+
+def size = 5;
+defarray Bisuali[size] = {"Amber", 2, "sf", m, 1};
+
+def i =0;
+
+while( i < size)
+{
+    display callArray Bisuali[i];
+    display "\n";
+     set i = (i + 1);
+};

@@ -157,6 +157,7 @@ lexeme* copier1(lexeme* var)
     temp-> type = var->type;
     temp-> definingEnv = var->definingEnv;
     temp-> lineNum = var->lineNum;
+    temp-> array = var->array;
 
     lexeme *head = newLex(ARG);
     head->left = temp;
@@ -242,15 +243,15 @@ lexeme* evalCallArray( lexeme* tree, lexeme *env)
 
    if  (x->integerVal <=  index)
     {
-        fprintf(stdout, "SIMANTIC ERROR: Increase the Size of the Array! - Current Size: %d\n", x->integerVal);
+        fprintf(stdout, "SEMANTIC ERROR: Increase the Size of the Array! - Current Size: %d\n", x->integerVal);
         if(tree->left->lineNum != 0)
         fprintf(stdout, "Line No: %d\n", tree->left->lineNum);
-        exit(1);
+        //exit(1);
     }
     else
     if(index< 0)
     {
-        fprintf(stdout, "SIMANTIC ERROR: Index for array is negative \nLine No: %d\n", tree->left->lineNum);
+        fprintf(stdout, "SEMANTIC ERROR: Index for array is negative \nLine No: %d\n", tree->left->lineNum);
         exit(1);
     }
     
@@ -267,7 +268,7 @@ lexeme* evalSetArray(lexeme* tree, lexeme* env)
   //  printf("\nPrinting INDEX%d", index);
     if  (x->integerVal <=  index)
     {
-        fprintf(stdout, "SIMANTIC ERROR: Increase the Size of the Array! - Current Size: %d\n", x->integerVal);
+        fprintf(stdout, "SEMANTIC ERROR: Increase the Size of the Array! - Current Size: %d\n", x->integerVal);
         if(tree->left->lineNum != 0)
         fprintf(stdout, "Line No: %d\n", tree->left->lineNum);
         exit(1);
@@ -275,7 +276,7 @@ lexeme* evalSetArray(lexeme* tree, lexeme* env)
     else
     if(index< 0)
     {
-        fprintf(stdout, "SIMANTIC ERROR: Index for array is negative \nLine No: %d\n", tree->left->lineNum);
+        fprintf(stdout, "SEMANTIC ERROR: Index for array is negative \nLine No: %d\n", tree->left->lineNum);
         exit(1);
     }
     lexeme * evaluatedVal = eval(tree->right->left, env);
@@ -307,7 +308,7 @@ int checkForOparantConsistency( lexeme *left, lexeme *right, lexeme *tree)
         return 2;
     }
 
-    fprintf(stdout, "SIMANTIC ERROR: Trying to compare 2 different types:\n");
+    fprintf(stdout, "SEMANTIC ERROR: Trying to compare 2 different types:\n");
     if(left->lineNum != 0)
     fprintf(stdout, "Look at Line No: %d\n", left->lineNum);
     fprintf(stdout, "OR Look at Line No: %d\n", right->lineNum);
@@ -700,12 +701,12 @@ lexeme *evalDisplay(lexeme *tree, lexeme *env)
             else
             if(value->type == LAMBDA)
             {
-                fprintf(stdout, "\nFunction ID: %d  ", value->integerVal);
+                fprintf(stdout, "\nFunction : ");
                 
                 fprintf(stdout, "<");
                 while(value->left != NULL)
                 {    
-                    fprintf(stdout,"%s" ,value->left->name);
+                    fprintf(stdout," %s " ,value->left->name);
                     value = value->left;
                 }
                 fprintf(stdout, ">\n");
@@ -889,6 +890,6 @@ int main (int argc, char** argv)
     
 
     fclose(fp);
-    fprintf (stdout, "YEAHHH!\n");
+   // fprintf (stdout, "YEAHHH!\n");
     return 0;
 }
